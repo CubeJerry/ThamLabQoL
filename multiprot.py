@@ -233,7 +233,7 @@ if __name__ == "__main__":
     # Open CSV file
     with open(output_file, mode="w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["ID", "Length", "MW", "pI", "Extinction", "Instability", "Aliphatic", "Half-life"])
+        writer.writerow(["ID", "Length", "MW", "pI", "Extinction Coefficient", "Instability Index", "Aliphatic Index", "Half-life"])
 
         # Process each sequence
         for header, seq in sequences.items():
