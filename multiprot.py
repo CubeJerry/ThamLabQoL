@@ -3,19 +3,15 @@ import csv
 from math import exp
 
 
-pKa = {
-    "Cterm": 3.55,
-    "Nterm": 8.6,
-    "C": 9.0,
-    "D": 4.05,
-    "E": 4.45,
-    "H": 5.98,
-    "Cys": 8.18,
-    "Tyr": 10.07,
-    "Lys": 10.53,
-    "Arg": 12.48
-}
 
+# Fixed pKa values for sidechains
+pKa_fixed = {"K": 10.0, "R": 12.0, "H": 5.98, "D": 4.05, "E": 4.45, "C": 9.0, "Y": 10.0}
+# Approx. N-terminal pKa depending on residue
+Nterm_pKa = {"A": 7.59, "M": 7.0, "S": 6.93, "P": 8.36, "T": 6.82, "V": 7.44, "E": 7.70}
+# C-terminal default pKa
+Cterm_default = 3.55
+# C-terminal corrections for D/E
+pK_cterm = {"D": 4.55, "E": 4.75}
 
 aa_weights = {
     "A": 89.0932, "R": 174.201, "N": 132.1179, "D": 133.1027,
@@ -168,27 +164,42 @@ def read_fasta_multiseq(filename):
 def molecular_weight(seq):
     return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528
 
-def calculate_pI(seq, epsilon=0.01):
+def calculate_pI(seq, epsilon=0.0001):
+    seq = seq.upper()
     Nterm = Nterm_pKa.get(seq[0], 7.5)
-    charged_counts = {aa: seq.count(aa) for aa in "KRHDECY"}
-    p_list = [(pKa_fixed[aa], charged_counts[aa]) for aa in "KRH" if charged_counts[aa] > 0] + [(Nterm, 1)]
-    n_list = [(pKa_fixed[aa], charged_counts[aa]) for aa in "DECY" if charged_counts[aa] > 0] + [(Cterm, 1)]
+    last = seq[-1]
+    Cterm = pK_cterm.get(last, Cterm_default)
 
-    def charge_func(ph):
-        pos = sum(c / (1 + 10**(ph - pk)) for pk, c in p_list)
-        neg = sum(c / (1 + 10**(pk - ph)) for pk, c in n_list)
+    # Count charged residues
+    counts = {aa: seq.count(aa) for aa in "KRHDECY"}
+    # Avoid double-counting C-terminal D/E
+    if last in ["D", "E"]:
+        counts[last] = max(0, counts[last]-1)
+
+    # Positive: K, R, H + Nterm
+    pos_groups = [(pKa_fixed[aa], counts[aa]) for aa in "KRH" if counts[aa] > 0]
+    pos_groups.append((Nterm, 1))
+    # Negative: D, E, C, Y + Cterm
+    neg_groups = [(pKa_fixed[aa], counts[aa]) for aa in "DECY" if counts[aa] > 0]
+    neg_groups.append((Cterm, 1))
+
+    def net_charge(ph):
+        pos = sum(c / (1 + 10**(ph - pk)) for pk, c in pos_groups)
+        neg = sum(c / (1 + 10**(pk - ph)) for pk, c in neg_groups)
         return pos - neg
 
-    ph = 7.0
-    step = 3.5
-    last_charge = charge_func(ph)
+    def bisect(low, high):
+        mid = (low + high)/2
+        charge = net_charge(mid)
+        if high - low < epsilon:
+            return mid
+        if charge > 0:
+            return bisect(mid, high)
+        else:
+            return bisect(low, mid)
 
-    while abs(last_charge) >= epsilon:
-        ph += step if last_charge > 0 else -step
-        last_charge = charge_func(ph)
-        step /= 2.0
+    return round(bisect(4.0, 12.0), 2)
 
-    return round(ph, 2)
 
 def extinction_coefficient(seq):
     return (seq.count("W") * aa_extinction["W"] + seq.count("Y") * aa_extinction["Y"] + seq.count("C") * aa_extinction["C"]) / (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528)
