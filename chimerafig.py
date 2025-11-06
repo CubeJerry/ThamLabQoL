@@ -1,16 +1,16 @@
-# complexfig.cxc
+# chimerafig.cxc
 # Usage in ChimeraX:
 #   source https://raw.githubusercontent.com/youruser/repo/main/nice_surface.cxc
-#   complexfig <object> <chain>
+#   chimerafig <object> <chain>
 # Examples:
-#   complexfig 2vwd A
-#   complexfig mystructure.cif B
-#   complexfig #1 C
+#   chimerafig 2vwd A
+#   chimerafig mystructure.cif B
+#   chimerafig #1 C
 
 from chimerax.core.commands import run
 import os
 
-def complexfig(session, object_arg, chain_id):
+def chimerafig(session, object_arg, chain_id):
     """
     Display a specified chain as surface (gray) and other chains as cartoon,
     with publication-quality aesthetics.
@@ -85,4 +85,4 @@ from chimerax.core.commands import CmdDesc, register
 from chimerax.core.commands import StringArg
 
 desc = CmdDesc(required=[('object_arg', StringArg), ('chain_id', StringArg)])
-register('complexfig', desc, complexfig)
+register('chimerafig', desc, chimerafig)
