@@ -14,7 +14,7 @@ def outline(obj_name):
     """
     
     # Make sure object exists
-    if not cmd.exists(obj_name):
+    if obj_name not in cmd.get_object_list():
         print(f"Object '{obj_name}' does not exist in PyMOL.")
         return
     
