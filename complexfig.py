@@ -48,7 +48,7 @@ def complexfig(obj, chain_id):
     cmd.orient()
     cmd.zoom("all")
 
-    print(f"✅ Displayed {obj} with chain {chain_id} as surface.")
+    print(f"Displaying figure")
 
 # Register command in PyMOL
 cmd.extend("complexfig", complexfig)
