@@ -1,16 +1,18 @@
-# chimerafig.cxc
+# cxfig.py
 # Usage in ChimeraX:
-#   source https://raw.githubusercontent.com/youruser/repo/main/nice_surface.cxc
-#   chimerafig <object> <chain>
+#   run /path/to/cxfig.py   OR
+#   run https://raw.githubusercontent.com/youruser/repo/main/cxfig.py
+# Then:
+#   cxfig <object> <chain>
 # Examples:
-#   chimerafig 2vwd A
-#   chimerafig mystructure.cif B
-#   chimerafig #1 C
+#   cxfig 2vwd A
+#   cxfig mystructure.cif B
+#   cxfig #1 C
 
 from chimerax.core.commands import run
 import os
 
-def chimerafig(session, object_arg, chain_id):
+def cxfig(session, object_arg, chain_id):
     """
     Display a specified chain as surface (gray) and other chains as cartoon,
     with publication-quality aesthetics.
@@ -78,11 +80,14 @@ def chimerafig(session, object_arg, chain_id):
     run(session, "view zoom")
 
     # Feedback
-    session.logger.info(f"Displaying figure. Example export command: save figure.png supersample 8 transparentBackground true height 2500")
+    session.logger.info(f"✅ Displayed chain {chain_id} of {object_arg} (model {model_id}) as surface, others in cartoon.")
 
-# --- Register the command ---
-from chimerax.core.commands import CmdDesc, register
-from chimerax.core.commands import StringArg
+# --- Register the command with synopsis and examples ---
+from chimerax.core.commands import CmdDesc, register, StringArg
 
-desc = CmdDesc(required=[('object_arg', StringArg), ('chain_id', StringArg)])
-register('chimerafig', desc, chimerafig)
+desc = CmdDesc(
+    required=[('object_arg', StringArg), ('chain_id', StringArg)],
+    brief="Display a complex with one chain as surface and others as cartoon",
+    examples=["cxfig 2vwd A", "cxfig mystructure.cif B", "cxfig #1 C"]
+)
+register('cxfig', desc, cxfig)
