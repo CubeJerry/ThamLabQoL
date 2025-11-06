@@ -1,9 +1,9 @@
 # cxfig.cxc
 # Usage:
-# runscript /path/to/cxfig.cxc <model> <chain>
+# runscript /path/to/cxfig.cxc <model> <chain> <id>
 
 # Load the model
-open $1 id #1
+open $1 id $3
 
 # Scene aesthetics
 lighting soft
@@ -20,8 +20,8 @@ cartoon suppressBackboneDisplay false
 cartoon style protein
 
 # Highlight selected chain as surface
-surface #1/$2
-color #1/$2 #b3b3b3
+surface #$3/$2
+color $#3/$2 #b3b3b3
 
 
 # Orient and zoom
