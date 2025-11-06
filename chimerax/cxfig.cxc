@@ -20,8 +20,8 @@ cartoon suppressBackboneDisplay false
 cartoon style protein
 
 # Highlight selected chain as surface
-surface #1/A
-color #1/A #b3b3b3
+surface #1/$2
+color #1/$2 #b3b3b3
 
 
 # Orient and zoom
