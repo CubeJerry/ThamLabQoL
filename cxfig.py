@@ -89,4 +89,4 @@ desc = CmdDesc(
     required=[('object_arg', StringArg), ('chain_id', StringArg)]
 )
 register('cxfig', desc, cxfig)
-)
+
