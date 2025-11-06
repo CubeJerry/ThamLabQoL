@@ -86,8 +86,7 @@ def cxfig(session, object_arg, chain_id):
 from chimerax.core.commands import CmdDesc, register, StringArg
 
 desc = CmdDesc(
-    required=[('object_arg', StringArg), ('chain_id', StringArg)],
-    brief="Display a complex with one chain as surface and others as cartoon",
-    examples=["cxfig 2vwd A", "cxfig mystructure.cif B", "cxfig #1 C"]
+    required=[('object_arg', StringArg), ('chain_id', StringArg)]
 )
 register('cxfig', desc, cxfig)
+)
