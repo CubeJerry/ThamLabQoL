@@ -1,39 +1,29 @@
 # cxfig.cxc
 # Usage:
-#   source /path/to/cxfig.cxc
-#   cxfig <model> <chain>
-# Examples:
-#   cxfig 2vwd A
-#   cxfig myfile.cif B
-#   cxfig #1 C
+# runscript /path/to/cxfig.cxc <model> <chain>
 
-define cxfig m c
-    # m = model (PDB ID, loaded model name, #ID)
-    # c = chain ID
+# Load the model
+open $1
 
-    # --- Load model if not already loaded ---
-    if !models m
-        open m
-    end
+# Scene aesthetics
+lighting soft
+hide atoms
+set bgColor #ffffff00
+graphics silhouettes true width 5
+camera ortho
 
-    # --- Scene aesthetics ---
-    lighting soft
-    hide atoms
-    set bgColor #ffffff00
-    graphics silhouettes true width 5
-    camera ortho
+# Cartoon styling
+cartoon style protein modeHelix default arrows false xsection oval width 2 thickness 2
+cartoon suppressBackboneDisplay false
 
-    # --- Cartoon styling ---
-    cartoon style protein modeHelix default arrows false xsection oval width 2 thickness 2
-    cartoon suppressBackboneDisplay false
-    color lightblue protein
+# Show all chains as cartoon first
+cartoon style protein
 
-    # --- Highlight selected chain ---
-    surface m:c
-    color gray80 m:c
-    transparency 30 m:c surfaces
+# Highlight selected chain as surface
+surface #1/A
+color #1/A #b3b3b3
 
-    # --- Orient and zoom ---
-    view orient
-    view zoom
-end
+
+# Orient and zoom
+view orient
+view zoom
