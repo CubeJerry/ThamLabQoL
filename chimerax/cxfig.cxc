@@ -1,6 +1,6 @@
 # cxfig.cxc
 # Usage:
-# runscript /path/to/cxfig.cxc <model> <chain> <id>
+# runscript /path/to/cxfig.cxc <model> <chain> <idnumber>
 
 # Load the model
 open $1 id $3
@@ -21,7 +21,7 @@ cartoon style protein
 
 # Highlight selected chain as surface
 surface #$3/$2
-color $#3/$2 #b3b3b3
+color #$3/$2 #b3b3b3 
 
 
 # Orient and zoom
