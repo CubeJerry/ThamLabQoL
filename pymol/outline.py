@@ -43,7 +43,7 @@ def outline(obj_name):
     # Optional: zoom onto the object
     cmd.zoom(obj_name)
     
-    print(f"Figure ready'")
+    print(f"Figure ready")
 
 # Register the command for interactive use
 cmd.extend("outline", outline)
