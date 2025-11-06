@@ -3,7 +3,7 @@
 # runscript /path/to/cxfig.cxc <model> <chain>
 
 # Load the model
-open $1
+open $1 id #1
 
 # Scene aesthetics
 lighting soft
