@@ -12,7 +12,7 @@ I also recommend downloading this script https://raw.githubusercontent.com/cbalb
 
 The PyMOL commands are straightforward:
 ```
-complexfig object_name, antigen_chain_id (this will remain in a surface view)
+complexfig object_name, antigen_chain_id (this will remain in a surface view. use quotation marks if there are multiple antigen chains e.g "A,B") 
 outline object_name
 ```
 
@@ -20,4 +20,5 @@ ChimeraX is a little more complicated. You will have to download the script and 
 ```
 runscript /path/to/cxfig.cxc <model_name> <antigen_chain> <idnumber>
 ```
+
 I recommend setting a new id number for each model.
