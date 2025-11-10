@@ -1,8 +1,3 @@
-# pymol_fig.py
-# Usage in PyMOL:
-#   run pymol_fig.py
-#   make_figure("2vwd")  # object name in PyMOL
-
 from pymol import cmd
 
 def outline(obj_name):
