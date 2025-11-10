@@ -3,12 +3,16 @@ import os
 
 def complexfig(obj, chain_ids):
     """
-    Display specified chain(s) as surface (gray80)
-    and others as cartoon (lightblue), with aesthetic settings.
-    
-    chain_ids: str, comma-separated chain letters, e.g., "A,B"
+    Display specified chain(s) as surface (gray80),
+    others as cartoon (lightblue), with nice render settings.
+    Accepts a single chain ('A') or multiple chains as a comma-separated string ('A,D').
     """
-    # If object isn't loaded yet, fetch or load
+
+    # Remove quotes if user included them
+    chain_ids = chain_ids.replace('"', '').replace("'", "")
+    target_chains = [c.strip() for c in chain_ids.split(",")]
+
+    # Load object if not already loaded
     if not cmd.get_object_list(obj):
         if os.path.exists(obj):
             cmd.load(obj, obj)
@@ -16,26 +20,25 @@ def complexfig(obj, chain_ids):
             cmd.fetch(obj, async_=0)
             obj = obj.lower()
 
-    # Split chains
+    # Split chains internally
     cmd.split_chains(obj)
 
-    # Parse target chains
-    target_chains = [c.strip() for c in chain_ids.split(",")]
-    target_selection = " or ".join([f"{obj}_{c}" for c in target_chains])
-
-    # Hide all
+    # Hide all first
     cmd.hide("everything")
 
     # Show target chains as surface
-    cmd.show("surface", target_selection)
-    cmd.color("gray80", target_selection)
+    for c in target_chains:
+        chain_obj = f"{obj}_{c}"
+        cmd.show("surface", chain_obj)
+        cmd.color("gray80", chain_obj)
 
-    # Show other chains as cartoon
-    other_selection = f"{obj}_* and not ({target_selection})"
-    cmd.show("cartoon", other_selection)
-    cmd.color("lightblue", other_selection)
+    # Show all other chains as cartoon
+    others = " or ".join([f"{obj}_{c}" for c in cmd.get_chains(obj) if c not in target_chains])
+    if others:
+        cmd.show("cartoon", others)
+        cmd.color("lightblue", others)
 
-    # Apply nice render settings
+    # Render settings
     cmd.set("ambient_occlusion_mode", 1)
     cmd.set("specular", 0)
     cmd.set("ambient", 0.4)
@@ -50,7 +53,7 @@ def complexfig(obj, chain_ids):
     cmd.orient()
     cmd.zoom("all")
 
-    print(f"Displaying figure for chains: {', '.join(target_chains)}")
+    print(f"Displaying {obj} with chains {', '.join(target_chains)}")
 
 # Register command in PyMOL
 cmd.extend("complexfig", complexfig)
