@@ -20,24 +20,20 @@ def complexfig(obj, chain_ids):
             cmd.fetch(obj, async_=0)
             obj = obj.lower()
 
-    # Split chains internally
-    cmd.split_chains(obj)
-
     # Hide everything first
     cmd.hide("everything")
 
     # Show target chains as surface
     for c in target_chains:
-        chain_obj = f"{obj}_{c}"
-        cmd.show("surface", chain_obj)
-        cmd.color("gray80", chain_obj)
+        cmd.show("surface", f"{obj} and chain {c}")
+        cmd.color("gray80", f"{obj} and chain {c}")
 
     # Show all other chains as cartoon
     all_chains = cmd.get_chains(obj)
-    others_chains = [c for c in all_chains if c not in target_chains]
+    other_chains = [c for c in all_chains if c not in target_chains]
 
-    if others_chains:
-        others_selection = " or ".join([f"{obj} and chain {c}" for c in others_chains])
+    if other_chains:
+        others_selection = " or ".join([f"{obj} and chain {c}" for c in other_chains])
         cmd.show("cartoon", others_selection)
         cmd.color("lightblue", others_selection)
 
