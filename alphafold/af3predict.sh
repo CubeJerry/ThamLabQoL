@@ -8,14 +8,15 @@
 #SBATCH --error=/dev/null
 
 # === Input arguments ===
-NAME="$1"   # e.g. 7abc
+NAME="$1"        # e.g. 7abc
+OUTPUT_DIR="$2"  # e.g. results_7abc
 FASTA_FILE="${NAME}.fasta"
 JSON_FILE="${NAME}.json"
-OUTPUT_DIR="/vast/scratch/users/$USER/AF3Outputs/${NAME}"
 
-if [[ -z "$NAME" ]]; then
-    echo "❌ Error: Missing input name."
-    echo "Usage: sbatch af3_job.sh <name>"
+if [[ -z "$NAME" || -z "$OUTPUT_DIR" ]]; then
+    echo "❌ Error: Missing input arguments."
+    echo "Usage: sbatch af3_job.sh <name> <output_dir>"
+    echo "Example: sbatch af3_job.sh 7abc AF3Outputs_7abc"
     exit 1
 fi
 
@@ -25,6 +26,7 @@ if [[ ! -f "$FASTA_FILE" ]]; then
     exit 1
 fi
 
+# === Convert FASTA → JSON if needed ===
 if [[ -f "$JSON_FILE" ]]; then
     echo "⚠️ JSON file '$JSON_FILE' already exists, skipping conversion."
 else
@@ -43,4 +45,3 @@ module load alphafold/3.0.0
 # === Run AlphaFold3 ===
 echo "Running AlphaFold3 on $JSON_FILE ..."
 alphafold3 -o "$OUTPUT_DIR" -i "$JSON_FILE"
-

@@ -1,15 +1,12 @@
-# nice_surface.py
-# Usage inside PyMOL:
-#   run /path/to/complexfig.py
-#   complexfig 2vwd, A 
-
 from pymol import cmd
 import os
 
-def complexfig(obj, chain_id):
+def complexfig(obj, chain_ids):
     """
-    Display a specified chain as surface (gray80)
+    Display specified chain(s) as surface (gray80)
     and others as cartoon (lightblue), with aesthetic settings.
+    
+    chain_ids: str, comma-separated chain letters, e.g., "A,B"
     """
     # If object isn't loaded yet, fetch or load
     if not cmd.get_object_list(obj):
@@ -21,17 +18,22 @@ def complexfig(obj, chain_id):
 
     # Split chains
     cmd.split_chains(obj)
-    chain_obj = f"{obj}_{chain_id}"
+
+    # Parse target chains
+    target_chains = [c.strip() for c in chain_ids.split(",")]
+    target_selection = " or ".join([f"{obj}_{c}" for c in target_chains])
 
     # Hide all
     cmd.hide("everything")
 
-    # Show target chain as surface
-    cmd.show("surface", chain_obj)
-    cmd.color("gray80", chain_obj)
+    # Show target chains as surface
+    cmd.show("surface", target_selection)
+    cmd.color("gray80", target_selection)
 
     # Show other chains as cartoon
-    cmd.show("cartoon", f"{obj}_* and not {chain_obj}")
+    other_selection = f"{obj}_* and not ({target_selection})"
+    cmd.show("cartoon", other_selection)
+    cmd.color("lightblue", other_selection)
 
     # Apply nice render settings
     cmd.set("ambient_occlusion_mode", 1)
@@ -48,7 +50,7 @@ def complexfig(obj, chain_id):
     cmd.orient()
     cmd.zoom("all")
 
-    print(f"Displaying figure")
+    print(f"Displaying figure for chains: {', '.join(target_chains)}")
 
 # Register command in PyMOL
 cmd.extend("complexfig", complexfig)

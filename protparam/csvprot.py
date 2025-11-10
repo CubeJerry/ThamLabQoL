@@ -236,21 +236,38 @@ if len(sys.argv) != 2:
     sys.exit(1)
 
 input_csv = sys.argv[1]
-output_csv = input_csv.rsplit(".", 1)[0] + "_params.csv"
+output_csv = input_csv.rsplit(".", 1)[0] + "_protparam.csv"
+
+sequence_columns = ["sequences", "sequence_alignment_aa", "VHH", "sequence", "Sequences", "Sequence"]
 
 with open(input_csv, newline='') as infile:
     reader = csv.DictReader(infile)
-    fieldnames = reader.fieldnames + ["sequence_alignment_aa_mod", "Length", "MW", "pI",
-                                      "Extinction_Coefficient", "Instability_Index",
-                                      "Aliphatic_Index", "Half_life"]
+
+    # Detect which column to use
+    seq_col = next((col for col in sequence_columns if col in reader.fieldnames), None)
+    if seq_col is None:
+        print(f"Error: input CSV must have one of these columns: {sequence_columns}")
+        sys.exit(1)
+
+    fieldnames = reader.fieldnames + [
+        f"{seq_col}_mod", "Length", "MW", "pI",
+        "Extinction_Coefficient", "Instability_Index",
+        "Aliphatic_Index", "Half_life"
+    ]
 
     with open(output_csv, 'w', newline='') as outfile:
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
         writer.writeheader()
 
         for row in reader:
-            seq = row["sequence_alignment_aa"] + "VSS"
-            row["sequence_alignment_aa_mod"] = seq
+            # Clean sequence and append VSS only if needed
+            seq = row[seq_col].replace(" ", "").strip()
+            if not seq.endswith("VSS"):
+                seq += "VSS"
+
+            row[f"{seq_col}_mod"] = seq
+
+            # Compute metrics
             row["Length"] = len(seq)
             row["MW"] = round(molecular_weight(seq), 2)
             row["pI"] = calculate_pI(seq)
@@ -260,5 +277,6 @@ with open(input_csv, newline='') as infile:
             row["Half_life"] = half_life(seq)
 
             writer.writerow(row)
+
 
 print(f"Processed CSV saved as {output_csv}")

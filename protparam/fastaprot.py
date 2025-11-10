@@ -233,7 +233,7 @@ def half_life(seq):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python multiprot.py <FASTA_FILE>")
+        print("Usage: python fastaprot.py <FASTA_FILE>")
         sys.exit(1)
 
     fasta_file = sys.argv[1]
