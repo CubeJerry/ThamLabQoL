@@ -51,8 +51,7 @@ def complexfig(obj, chain_ids):
 
     cmd.orient()
     cmd.zoom("all")
-
-    print(f"Displaying {obj} with chains {', '.join(target_chains)}")
+    cmd.split_chains(obj)
 
 # Register command in PyMOL
 cmd.extend("complexfig", complexfig)
