@@ -6,7 +6,7 @@ It has been set up to generate a larger number of predictions than our default s
 ## What you need
 
 A fasta file with your protein sequences, and the scripts here.
----
+
 
 ## What it does
 
@@ -15,7 +15,7 @@ A fasta file with your protein sequences, and the scripts here.
 3. Loads the appropriate AlphaFold3 environment on Milton.
 4. Runs the prediction and saves all model outputs inside your specified folder.
 
----
+
 
 ## Usage
 
@@ -36,4 +36,5 @@ sbatch af3predict.sh /home/users/allstaff/[USERNAME]/9dx6 /home/users/allstaff/[
 
 ```
 Of course, those of you more familiar with file paths will know that this can be made way shorter.
+
 
