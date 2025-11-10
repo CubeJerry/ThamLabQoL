@@ -39,7 +39,7 @@ Want to run a structure prediction but have a sequence you don't want to disclos
    
    
 ## ProtParam Calculations
-Tired of constantly copypasting sequences into ProtParam and hitting enter, then having to scroll down and then find the number you're looking for?  Use the scripts in the ***protparam*** folder.
+Tired of constantly copypasting sequences into ProtParam and hitting enter, then having to scroll down to find the number you're looking for?  Use the scripts in the ***protparam*** folder.
 
 Scripts provided for both .csv and fasta files.
 
