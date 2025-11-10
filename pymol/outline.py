@@ -25,7 +25,7 @@ def outline(obj_name):
     cmd.show("surface", obj_name)
     
     # Set transparency for surface
-    cmd.set("transparency", 0.7, obj_name)
+    cmd.set("transparency", 0.6, obj_name)
     cmd.color("gray80", obj_name)
     # Set rendering / aesthetics
     cmd.set("specular", 0)
