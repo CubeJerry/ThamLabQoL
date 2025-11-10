@@ -4,7 +4,7 @@ Speeding up a few things because I am lazy. More updates to come as I think of s
 
 Firstly a quick guide on how to connect to **Milton**, in case anyone hasn't used it before.
 
-NOTE: THE PATH OF YOUR PERSONAL FOLDER IS ALWAYS 
+NOTE: IF YOU DON'T HAVE ACCESS TO VAST SCRATCH, THEN IT USES THE PATH OF YOUR PERSONAL FOLDER
 ```
 /home/users/allstaff/[WEHI_USERNAME]
 ```
