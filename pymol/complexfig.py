@@ -21,7 +21,7 @@ def complexfig(obj, chain_ids):
             obj = obj.lower()
 
     # Hide everything first
-    cmd.hide("everything")
+    cmd.hide("everything", obj)
 
     # Show target chains as surface
     for c in target_chains:
