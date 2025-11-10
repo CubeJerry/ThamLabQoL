@@ -25,7 +25,6 @@ From your Milton terminal (either via **Open OnDemand → Open in Terminal** or 
 
 ```
 sbatch af3predict.sh <fasta_name> <output_dir>
-
 ```
 **IMPORTANT: FASTA_NAME HERE IS JUST THE NAME OF YOUR FASTA WITHOUT THE .FASTA PART**
 
@@ -33,8 +32,8 @@ So if you had a fasta file ```9dx6.fasta``` of Mel's structure for Fab826827 (PD
 
 ```
 sbatch af3predict.sh /home/users/allstaff/[USERNAME]/9dx6 /home/users/allstaff/[USERNAME]/outputs
-
 ```
 Of course, those of you more familiar with file paths will know that this can be made way shorter.
+
 
 
