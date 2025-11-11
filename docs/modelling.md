@@ -8,6 +8,8 @@ Simply paste the URL of the script you want to use in and it's ready.
 
 I also recommend downloading this script https://raw.githubusercontent.com/cbalbin-bio/pymol-color-alphafold/master/coloraf.py while you're at it.
 
+```set hash_max``` to a higher number to speed up ray tracing if needed.
+
 ## Usage
 
 The PyMOL commands are straightforward:
@@ -22,3 +24,4 @@ runscript /path/to/cxfig.cxc <model_name> <antigen_chain> <idnumber>
 ```
 
 I recommend setting a new id number for each model.
+
