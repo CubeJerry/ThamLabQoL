@@ -55,7 +55,7 @@ Want to generate figures like the ones below, but have a bunch of proteins so yo
 <img src="docs/complex.png" alt="6WNO Structure" width="300">
 
 ### electropot
-
+<img src="docs/electropot1.png" alt="2VWD Structure" width="300">
 
 ### cxfig
 <img src="docs/cxfig.png" alt="6WNO Structure" width="300">
