@@ -8,9 +8,6 @@ def electropot(obj_name):
     Usage:
         electropot <object_name>
     """
-    if not cmd.object_exists(obj_name):
-        print(f"[ERROR] Object '{obj_name}' not found in session.")
-        return
 
     # Run electrostatic potential
     util.protein_vacuum_esp(obj_name, mode=2, quiet=0, _self=cmd)
