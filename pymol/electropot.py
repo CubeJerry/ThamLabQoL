@@ -18,6 +18,7 @@ def electropot(obj_name):
     cmd.set("specular", 0)
     cmd.set("ambient", 0.4)
     cmd.bg_color("white")
+    cmd.set("label_color", "white")
 
     print(f"[DONE] Electrostatic potential applied to '{obj_name}'.")
 
