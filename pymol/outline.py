@@ -31,6 +31,7 @@ def outline(obj_name):
     cmd.set("ray_trace_mode", 1)
     cmd.set("antialias", 2)
     cmd.set("ray_shadow", "off")
+    cmd.set("ambient_occlusion_mode", 1)
     
     # Set background color to white
     cmd.bg_color("white")
