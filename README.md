@@ -72,4 +72,5 @@ Tip: set hash_max to a higher number if ray tracing is taking too long (may need
 
 ## Prepare BLI data for plotting in Prism
 
-Run ```bash dilution.sh "\path\to\data"```. Note that you need quotation marks around your path. Also, you do not need to point to the Results folder specifically, just the main folder with all your results.
+Run ```bash dilution.sh "\path\to\data"```. 
+Note that you need quotation marks around your path. Also, you do not need to point to the Results folder specifically, just the main folder with all your results.
