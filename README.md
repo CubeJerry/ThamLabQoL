@@ -69,3 +69,7 @@ Data from MediaFlux needs to be downloaded and modified before feeding into Cryo
 Simply run ```bash cryoemprep.sh``` and follow the prompts.
 
 Tip: set hash_max to a higher number if ray tracing is taking too long (may need to play around a bit)
+
+## Prepare BLI data for plotting in Prism
+
+Run ```bash dilution.sh "\path\to\data"```. Note that you need quotation marks around your path. Also, you do not need to point to the Results folder specifically, just the main folder with all your results.
