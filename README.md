@@ -1,4 +1,4 @@
-Speeding up a few things because I am lazy. More updates to come as I think of something.
+Speeding up a few things because I am lazy. More updates to come as I think of them.
 
 ## Preface
 
