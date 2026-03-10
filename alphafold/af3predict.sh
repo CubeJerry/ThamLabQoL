@@ -41,6 +41,15 @@ mkdir -p "$OUTPUT_DIR"
 module purge
 module load apptainer/1.4.1
 module load alphafold/3.0.0
+cat << 'EOF'
+  _______ _    _          __  __    _               ____  
+ |__   __| |  | |   /\   |  \/  |  | |        /\    |  _ \ 
+    | |  | |__| |  /  \  | \  / |  | |       /  \   | |_) |
+    | |  |  __  | / /\ \ | |\/| |  | |      / /\ \  |  _ < 
+    | |  | |  | |/ ____ \| |  | |  | |____ / ____ \ | |_) |
+    |_|  |_|  |_/_/    \_\_|  |_|  |______/_/    \_\ ____/ 
+                                                          
+EOF
 
 # === Run AlphaFold3 ===
 echo "Running AlphaFold3 on $JSON_FILE ..."
