@@ -2,7 +2,16 @@
 set -euo pipefail
 
 # Prompt for Mediaflux token and project name
-echo "Jerry's CryoSparc script activated."
+cat << 'EOF'
+  _______ _    _          __  __    _               ____  
+ |__   __| |  | |   /\   |  \/  |  | |        /\    |  _ \ 
+    | |  | |__| |  /  \  | \  / |  | |       /  \   | |_) |
+    | |  |  __  | / /\ \ | |\/| |  | |      / /\ \  |  _ < 
+    | |  | |  | |/ ____ \| |  | |  | |____ / ____ \ | |_) |
+    |_|  |_|  |_/_/    \_\_|  |_|  |______/_/    \_\ ____/ 
+                                                          
+EOF
+
 echo "Enter your Mediaflux download token:"
 read -r TOKEN
 [[ -z "$TOKEN" ]] && { echo "Error: No token entered."; exit 1; }
