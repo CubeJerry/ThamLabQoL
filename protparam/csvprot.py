@@ -162,7 +162,7 @@ def read_fasta_multiseq(filename):
     return sequences
 
 def molecular_weight(seq):
-    return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528 / 1000
+    return (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528) / 1000
 
 def calculate_pI(seq, epsilon=0.0001):
     seq = seq.upper()
