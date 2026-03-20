@@ -162,7 +162,7 @@ def read_fasta_multiseq(filename):
     return sequences
 
 def molecular_weight(seq):
-    return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528
+    return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528 / 1000
 
 def calculate_pI(seq, epsilon=0.0001):
     seq = seq.upper()
@@ -250,7 +250,7 @@ with open(input_csv, newline='') as infile:
         sys.exit(1)
 
     fieldnames = reader.fieldnames + [
-        f"{seq_col}_mod", "Length", "MW", "pI",
+        f"{seq_col}_mod", "Length", "MW (kDa)", "pI",
         "Extinction_Coefficient", "Instability_Index",
         "Aliphatic_Index", "Half_life"
     ]
