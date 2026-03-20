@@ -262,8 +262,6 @@ with open(input_csv, newline='') as infile:
         for row in reader:
             # Clean sequence and append VSS only if needed
             seq = row[seq_col].replace(" ", "").strip()
-            if not seq.endswith("VSS"):
-                seq += "VSS"
 
             row[f"{seq_col}_mod"] = seq
 
