@@ -202,7 +202,7 @@ def calculate_pI(seq, epsilon=0.0001):
 
 
 def extinction_coefficient(seq):
-    return (seq.count("W") * aa_extinction["W"] + seq.count("Y") * aa_extinction["Y"] + seq.count("C") * aa_extinction["C"]) / (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528)
+    return (seq.count("W") * aa_extinction["W"] + seq.count("Y") * aa_extinction["Y"] + (seq.count("C") // 2) * aa_extinction["C"]) / (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528)
 
 def instability_index(seq):
     score = 0
@@ -267,9 +267,9 @@ with open(input_csv, newline='') as infile:
 
             # Compute metrics
             row["Length"] = len(seq)
-            row["MW"] = round(molecular_weight(seq), 2)
+            row["MW (kDa)"] = round(molecular_weight(seq), 2)
             row["pI"] = calculate_pI(seq)
-            row["Extinction_Coefficient"] = round(extinction_coefficient(seq), 2)
+            row["Extinction_Coefficient"] = round(extinction_coefficient(seq), 3)
             row["Instability_Index"] = round(instability_index(seq), 2)
             row["Aliphatic_Index"] = round(aliphatic_index(seq), 2)
             row["Half_life"] = half_life(seq)
