@@ -238,7 +238,7 @@ if len(sys.argv) != 2:
 input_csv = sys.argv[1]
 output_csv = input_csv.rsplit(".", 1)[0] + "_protparam.csv"
 
-sequence_columns = ["sequences", "sequence_alignment_aa", "VHH", "sequence", "Sequences", "Sequence"]
+sequence_columns = ["sequences", "sequence_alignment_aa", "VHH", "sequence", "Sequences", "Sequence", "AA seq", "aa seq", "AA Seq", "aa Seq", "AA seq (inc signal peptide)","Aaseq (mat protein only)"]
 
 with open(input_csv, newline='') as infile:
     reader = csv.DictReader(infile)
