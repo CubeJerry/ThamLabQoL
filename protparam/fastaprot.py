@@ -162,7 +162,7 @@ def read_fasta_multiseq(filename):
     return sequences
 
 def molecular_weight(seq):
-    return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528
+    return sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528 / 1000
 
 def calculate_pI(seq, epsilon=0.0001):
     seq = seq.upper()
@@ -244,7 +244,7 @@ if __name__ == "__main__":
     # Open CSV file
     with open(output_file, mode="w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["ID", "Length", "MW", "pI", "Extinction Coefficient", "Instability Index", "Aliphatic Index", "Half-life"])
+        writer.writerow(["ID", "Length", "MW (kDa)", "pI", "Extinction Coefficient", "Instability Index", "Aliphatic Index", "Half-life"])
 
         # Process each sequence
         for header, seq in sequences.items():
