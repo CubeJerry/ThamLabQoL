@@ -202,7 +202,7 @@ def calculate_pI(seq, epsilon=0.0001):
 
 
 def extinction_coefficient(seq):
-    return (seq.count("W") * aa_extinction["W"] + seq.count("Y") * aa_extinction["Y"] + seq.count("C") * aa_extinction["C"]) / (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528)
+    return (seq.count("W") * aa_extinction["W"] + seq.count("Y") * aa_extinction["Y"] + (seq.count("C") // 2) * aa_extinction["C"]) / (sum(aa_weights[aa] for aa in seq) - (len(seq) - 1) * 18.01528)
 
 def instability_index(seq):
     score = 0
@@ -253,7 +253,7 @@ if __name__ == "__main__":
                 len(seq),
                 round(molecular_weight(seq), 2),
                 calculate_pI(seq),
-                round(extinction_coefficient(seq), 2),
+                round(extinction_coefficient(seq), 3),
                 round(instability_index(seq), 2),
                 round(aliphatic_index(seq), 2),
                 half_life(seq)
