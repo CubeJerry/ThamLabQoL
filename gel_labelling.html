@@ -709,23 +709,60 @@ dropZone.addEventListener('drop', e => {
 });
 fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
+
 function loadFile(file) {
   state.imageFile = file;
   const reader = new FileReader();
-  reader.onload = ev => {
-    state.imageSrc = ev.target.result;
-    gelImg.src = state.imageSrc;
-    gelImg.onload = () => {
-      dropZone.style.display = 'none';
-      workspace.style.display = 'flex';
-      exportRow.classList.remove('hidden');
-      imgAdjustSection.classList.remove('hidden');
-      btnMarkFirst.disabled = false;
-      setStep(2);
-      showToast('Image loaded! Crop if needed, or mark lanes.');
-    };
+  const isTiff = file.name.toLowerCase().endsWith('.tif') || file.name.toLowerCase().endsWith('.tiff');
+
+  reader.onload = e => {
+    try {
+      if (isTiff) {
+        showToast('Processing TIFF file...');
+        const buffer = e.target.result;
+        const ifds = UTIF.decode(buffer);
+        UTIF.decodeImage(buffer, ifds[0]);
+        const rgba = UTIF.toRGBA8(ifds[0]);
+        
+        // Convert to canvas so the browser can see it
+        const canvas = document.createElement('canvas');
+        canvas.width = ifds[0].width;
+        canvas.height = ifds[0].height;
+        const ctx = canvas.getContext('2d');
+        const imgData = ctx.createImageData(canvas.width, canvas.height);
+        imgData.data.set(rgba);
+        ctx.putImageData(imgData, 0, 0);
+        
+        state.imageSrc = canvas.toDataURL('image/png'); // Standard format
+      } else {
+        // Standard PNG/JPG
+        state.imageSrc = e.target.result;
+      }
+      finishLoadingImage();
+    } catch (err) {
+      showToast('Error reading image file: ' + err.message);
+      console.error(err);
+    }
   };
-  reader.readAsDataURL(file);
+
+  if (isTiff) {
+    reader.readAsArrayBuffer(file);
+  } else {
+    reader.readAsDataURL(file);
+  }
+}
+
+function finishLoadingImage() {
+  gelImg.src = state.imageSrc;
+  gelImg.onload = () => {
+    dropZone.style.display = 'none';
+    workspace.style.display = 'flex';
+    exportRow.classList.remove('hidden');
+    imgAdjustSection.classList.remove('hidden');
+    btnMarkFirst.disabled = false;
+    setStep(2);
+    showToast('Image loaded! Crop if needed, or mark lanes.');
+  };
 }
 
 // ── CROPPER LOGIC ──
@@ -733,13 +770,10 @@ btnStartCrop.addEventListener('click', () => {
   if (cropperInstance) return;
   btnStartCrop.classList.add('hidden');
   cropActions.classList.remove('hidden');
-  laneLabelsTop.style.display = 'none'; // Hide labels temporarily
+  laneLabelsTop.style.display = 'none'; 
   
   cropperInstance = new Cropper(gelImg, {
-    viewMode: 1,
-    autoCropArea: 0.8,
-    background: false,
-    zoomable: false,
+    viewMode: 1, autoCropArea: 0.8, background: false, zoomable: false,
   });
 });
 
@@ -756,17 +790,13 @@ btnApplyCrop.addEventListener('click', () => {
   const canvas = cropperInstance.getCroppedCanvas();
   state.imageSrc = canvas.toDataURL('image/png');
   
-  cropperInstance.destroy();
-  cropperInstance = null;
-  
+  cropperInstance.destroy(); cropperInstance = null;
   gelImg.src = state.imageSrc;
   btnStartCrop.classList.remove('hidden');
   cropActions.classList.add('hidden');
   laneLabelsTop.style.display = 'block';
   
-  // Clear lanes as the relative width has changed
-  clearLanes();
-  showToast('Image cropped! Please remark your lanes.');
+  clearLanes(); showToast('Image cropped! Please remark your lanes.');
 });
 
 // ── LANE LOGIC ──
