@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GelFig — Gel Figure Annotator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2126;
+    --border: #2a2d35;
+    --accent: #7ee8a2;
+    --accent2: #4fc3f7;
+    --warn: #f9a825;
+    --text: #e8eaed;
+    --text-dim: #6b7280;
+    --text-dimmer: #3d4148;
+    --red: #ff6b6b;
+    --radius: 8px;
+    --panel-w: 300px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .logo span { color: var(--text-dim); font-weight: 300; }
+
+  .step-bar {
+    display: flex;
+    gap: 4px;
+    margin-left: 12px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-dim);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: default;
+    white-space: nowrap;
+  }
+
+  .step.active {
+    background: rgba(126, 232, 162, 0.08);
+    border-color: rgba(126, 232, 162, 0.3);
+    color: var(--accent);
+  }
+
+  .step.done {
+    color: var(--text-dimmer);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .step-num {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .step.active .step-num { background: var(--accent); color: #000; }
+  .step.done .step-num { background: var(--text-dimmer); color: #000; }
+
+  .header-actions { margin-left: auto; display: flex; gap: 8px; }
+
+  /* ── MAIN LAYOUT ── */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── SIDE PANEL ── */
+  .panel {
+    width: var(--panel-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .panel-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  input[type="text"], input[type="date"], select, textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    width: 100%;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #5dd67d; border-color: #5dd67d; color: #000; }
+
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-dim);
+  }
+  .btn-ghost:hover { color: var(--red); border-color: transparent; background: transparent; }
+
+  .panel-scroll {
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* ── LANE LIST ── */
+  .lane-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .lane-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .lane-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .lane-row input {
+    flex: 1;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .lane-row .btn-ghost { padding: 4px; flex-shrink: 0; }
+
+  /* ── CANVAS AREA ── */
+  .canvas-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(126,232,162,0.03) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 70%, rgba(79,195,247,0.03) 0%, transparent 60%),
+      var(--bg);
+    padding: 24px;
+    position: relative;
+  }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(126, 232, 162, 0.04);
+  }
+
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .drop-icon {
+    font-size: 48px;
+    opacity: 0.4;
+    line-height: 1;
+  }
+
+  .drop-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .drop-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ── WORKSPACE ── */
+  #workspace {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* ── FIGURE CONTAINER (exportable) ── */
+  #figure-container {
+    background: white;
+    padding: 24px 28px 20px;
+    border-radius: 4px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    user-select: none;
+  }
+
+  .fig-title-area {
+    margin-bottom: 12px;
+  }
+
+  .fig-title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+    text-align: center;
+    white-space: pre-wrap;
+    line-height: 1.4;
+  }
+
+  .fig-date {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #444;
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  /* ── GEL + OVERLAY ── */
+  .gel-wrapper {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+
+  #gel-img {
+    display: block;
+    max-width: 100%;
+    max-height: 55vh;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* Lane number labels */
+  #lane-labels-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .lane-label-top {
+    position: absolute;
+    transform: translateX(-50%) translateY(-100%);
+    top: -4px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #111;
+    text-align: center;
+    padding-bottom: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Click markers */
+  .lane-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(126, 232, 162, 0.7);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .lane-marker::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── LEGEND ── */
+  .fig-legend {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #222;
+    margin-top: 10px;
+    line-height: 1.7;
+  }
+
+  .fig-legend-title {
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+
+  /* ── CLICK MODE OVERLAY ── */
+  #click-overlay {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    cursor: crosshair;
+    z-index: 5;
+  }
+
+  #click-overlay.active { display: block; }
+
+  /* ── INSTRUCTION TOAST ── */
+  .toast {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  .toast.show { opacity: 1; }
+
+  /* ── LANE CLICK HINT ── */
+  .click-hint {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .click-hint span { color: var(--accent); }
+
+  /* ── RIGHT PANEL TABS ── */
+  .right-panel {
+    width: 240px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  /* ── MODE INDICATOR ── */
+  .mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(126,232,162,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(126,232,162,0.25);
+  }
+
+  .mode-badge.warn {
+    background: rgba(249,168,37,0.1);
+    color: var(--warn);
+    border-color: rgba(249,168,37,0.25);
+  }
+
+  .pulse {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── EXPORT BUTTONS ── */
+  .export-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ── LANE COUNT ADJUST ── */
+  .count-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .count-row button {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .count-row button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .count-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    color: var(--text);
+    min-width: 28px;
+    text-align: center;
+  }
+
+  /* ── CONTRAST SLIDER ── */
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .gel-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Gel<span>Fig</span></div>
+  <div class="step-bar">
+    <div class="step active" id="step1"><span class="step-num">1</span> Load Image</div>
+    <div class="step" id="step2"><span class="step-num">2</span> Mark Lanes</div>
+    <div class="step" id="step3"><span class="step-num">3</span> Label &amp; Export</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="panel">
+    <div class="panel-scroll">
+
+      <!-- Figure Info -->
+      <div class="panel-section">
+        <div class="section-label">Figure Info</div>
+        <div class="field">
+          <label>Title</label>
+          <textarea id="fig-title-input" rows="2" placeholder="e.g. SDS-PAGE Analysis of GST-tagged Proteins"></textarea>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="fig-date-input">
+        </div>
+        <div class="field">
+          <label>Gel type</label>
+          <input type="text" id="fig-geltype-input" placeholder="e.g. 12% SDS-PAGE">
+        </div>
+      </div>
+
+      <!-- Lane Setup -->
+      <div class="panel-section" id="lane-setup-section">
+        <div class="section-label">Lane Setup</div>
+        <div class="field">
+          <label>Number of lanes</label>
+          <div class="count-row">
+            <button id="lane-minus">−</button>
+            <span class="count-display" id="lane-count-display">5</span>
+            <button id="lane-plus">+</button>
+            <span style="font-size:11px; color:var(--text-dim); margin-left:4px;">lanes</span>
+          </div>
+        </div>
+
+        <div id="lane-mode-section">
+          <div class="field" style="margin-bottom:8px;">
+            <label>Lane positions</label>
+          </div>
+          <div id="lane-status-msg" style="font-size:12px; color:var(--text-dim); line-height:1.5; margin-bottom:8px;">
+            Load an image first, then click to mark lane positions.
+          </div>
+          <button class="btn btn-sm" id="btn-mark-first" disabled>
+            <span>◎</span> Click First Lane
+          </button>
+          <div style="height:6px"></div>
+          <button class="btn btn-sm" id="btn-mark-last" disabled>
+            <span>◎</span> Click Last Lane
+          </button>
+          <div style="height:6px"></div>
+          <button class="btn btn-sm" id="btn-clear-marks" style="margin-top:2px;" disabled>
+            ↺ Reset Positions
+          </button>
+        </div>
+      </div>
+
+      <!-- Image Adjustments -->
+      <div class="panel-section hidden" id="img-adjust-section">
+        <div class="section-label">Image Adjustments</div>
+        <div class="field">
+          <label>Brightness <span id="brightness-val" style="color:var(--accent)">0</span></label>
+          <input type="range" id="brightness" min="-100" max="100" value="0">
+        </div>
+        <div class="field">
+          <label>Contrast <span id="contrast-val" style="color:var(--accent)">0</span></label>
+          <input type="range" id="contrast" min="-100" max="100" value="0">
+        </div>
+        <div class="field">
+          <label>Invert image</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text)">
+            <input type="checkbox" id="invert-img" style="width:auto;accent-color:var(--accent)"> Invert colours
+          </label>
+        </div>
+      </div>
+
+      <!-- Labels -->
+      <div class="panel-section" id="labels-section">
+        <div class="section-label">Lane Labels</div>
+        <div class="lane-list" id="lane-label-list">
+          <!-- populated by JS -->
+        </div>
+        <div style="margin-top:10px;">
+          <button class="btn btn-sm" id="btn-add-lane-row" style="width:100%">+ Add lane</button>
+        </div>
+      </div>
+
+    </div><!-- /panel-scroll -->
+  </div><!-- /panel -->
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area" id="canvas-area">
+
+    <!-- Drop zone -->
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="image/*,.tiff,.tif">
+      <div class="drop-icon">🧬</div>
+      <div class="drop-title">Drop your gel image here</div>
+      <div class="drop-sub">Supports TIFF, PNG, JPEG, and other image formats<br>Drag &amp; drop or click to browse</div>
+    </div>
+
+    <!-- Workspace (hidden until image loaded) -->
+    <div id="workspace">
+      <div class="gel-controls">
+        <div id="mode-indicator" class="mode-badge hidden">
+          <span class="pulse"></span> <span id="mode-text">Click first lane centre</span>
+        </div>
+        <span style="font-size:11px; color:var(--text-dim); margin-left:auto;" id="img-info"></span>
+      </div>
+
+      <!-- Figure (white box) -->
+      <div id="figure-container">
+        <!-- Title -->
+        <div class="fig-title-area" id="fig-title-area" style="display:none">
+          <div class="fig-title" id="fig-title-display"></div>
+          <div class="fig-date" id="fig-date-display"></div>
+        </div>
+
+        <!-- Gel image + lane overlays -->
+        <div class="gel-wrapper">
+          <img id="gel-img" src="" alt="Gel">
+          <div id="lane-labels-top"></div>
+          <div id="click-overlay"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="fig-legend" id="fig-legend" style="display:none;">
+          <div class="fig-legend-title" id="fig-legend-title"></div>
+          <div id="fig-legend-body"></div>
+        </div>
+      </div>
+
+    </div><!-- /workspace -->
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Export row (only shown after image loaded) -->
+    <div id="export-row" class="hidden" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+      <button class="btn btn-primary" id="btn-export-png">↓ Export PNG</button>
+      <button class="btn" id="btn-export-clipboard">⧉ Copy to Clipboard</button>
+      <button class="btn btn-ghost" id="btn-load-new">⟳ New Image</button>
+    </div>
+
+  </div><!-- /canvas-area -->
+
+</div><!-- /main -->
+
+<script>
+// ── STATE ──
+const state = {
+  imageFile: null,
+  imageSrc: null,
+  laneCount: 5,
+  firstLaneX: null,   // fraction of image width
+  lastLaneX: null,
+  clickMode: null,    // 'first' | 'last'
+  brightness: 0,
+  contrast: 0,
+  invert: false,
+  labels: [],         // array of strings, length = laneCount
+};
+
+// ── ELEMENTS ──
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const workspace = document.getElementById('workspace');
+const gelImg = document.getElementById('gel-img');
+const laneLabelsTop = document.getElementById('lane-labels-top');
+const clickOverlay = document.getElementById('click-overlay');
+const figTitleInput = document.getElementById('fig-title-input');
+const figDateInput = document.getElementById('fig-date-input');
+const figGeltypeInput = document.getElementById('fig-geltype-input');
+const figTitleDisplay = document.getElementById('fig-title-display');
+const figDateDisplay = document.getElementById('fig-date-display');
+const figTitleArea = document.getElementById('fig-title-area');
+const figLegend = document.getElementById('fig-legend');
+const figLegendTitle = document.getElementById('fig-legend-title');
+const figLegendBody = document.getElementById('fig-legend-body');
+const laneCountDisplay = document.getElementById('lane-count-display');
+const laneLabelList = document.getElementById('lane-label-list');
+const btnMarkFirst = document.getElementById('btn-mark-first');
+const btnMarkLast = document.getElementById('btn-mark-last');
+const btnClearMarks = document.getElementById('btn-clear-marks');
+const modeIndicator = document.getElementById('mode-indicator');
+const modeText = document.getElementById('mode-text');
+const laneStatusMsg = document.getElementById('lane-status-msg');
+const toast = document.getElementById('toast');
+const exportRow = document.getElementById('export-row');
+const imgAdjustSection = document.getElementById('img-adjust-section');
+const imgInfo = document.getElementById('img-info');
+const figureContainer = document.getElementById('figure-container');
+
+// Set today's date
+figDateInput.valueAsDate = new Date();
+
+// ── FILE LOAD ──
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+function loadFile(file) {
+  state.imageFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    state.imageSrc = ev.target.result;
+    gelImg.src = state.imageSrc;
+    gelImg.onload = () => {
+      imgInfo.textContent = `${gelImg.naturalWidth} × ${gelImg.naturalHeight}px`;
+      dropZone.style.display = 'none';
+      workspace.style.display = 'flex';
+      exportRow.classList.remove('hidden');
+      imgAdjustSection.classList.remove('hidden');
+      btnMarkFirst.disabled = false;
+      laneStatusMsg.textContent = '→ Click "Click First Lane" then click the centre of lane 1 on the image.';
+      setStep(2);
+      showToast('Image loaded! Mark the first and last lane.');
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── LANE COUNT ──
+document.getElementById('lane-minus').addEventListener('click', () => {
+  if (state.laneCount > 1) { state.laneCount--; syncLaneCount(); }
+});
+document.getElementById('lane-plus').addEventListener('click', () => {
+  if (state.laneCount < 30) { state.laneCount++; syncLaneCount(); }
+});
+
+function syncLaneCount() {
+  laneCountDisplay.textContent = state.laneCount;
+  // Grow/shrink labels array
+  while (state.labels.length < state.laneCount) state.labels.push('');
+  while (state.labels.length > state.laneCount) state.labels.pop();
+  renderLabelList();
+  renderLaneOverlay();
+}
+
+syncLaneCount();
+
+// ── MARK LANES ──
+btnMarkFirst.addEventListener('click', () => enterClickMode('first'));
+btnMarkLast.addEventListener('click', () => enterClickMode('last'));
+btnClearMarks.addEventListener('click', () => {
+  state.firstLaneX = null;
+  state.lastLaneX = null;
+  renderLaneOverlay();
+  laneStatusMsg.textContent = '→ Click "Click First Lane" to start.';
+  btnMarkLast.disabled = true;
+  btnClearMarks.disabled = true;
+  showToast('Lane positions cleared.');
+});
+
+function enterClickMode(mode) {
+  state.clickMode = mode;
+  clickOverlay.classList.add('active');
+  modeIndicator.classList.remove('hidden');
+  modeText.textContent = mode === 'first' ? 'Click centre of FIRST lane' : 'Click centre of LAST lane';
+  showToast(mode === 'first' ? '→ Click the centre of the FIRST lane' : '→ Click the centre of the LAST lane');
+}
+
+clickOverlay.addEventListener('click', e => {
+  if (!state.clickMode) return;
+  const rect = gelImg.getBoundingClientRect();
+  const xFrac = (e.clientX - rect.left) / rect.width;
+
+  if (state.clickMode === 'first') {
+    state.firstLaneX = xFrac;
+    clickOverlay.classList.remove('active');
+    modeIndicator.classList.add('hidden');
+    state.clickMode = null;
+    btnMarkLast.disabled = false;
+    btnClearMarks.disabled = false;
+    laneStatusMsg.textContent = '✓ First lane marked. Now click "Click Last Lane".';
+    showToast('First lane marked! Now mark the last lane.');
+  } else if (state.clickMode === 'last') {
+    state.lastLaneX = xFrac;
+    clickOverlay.classList.remove('active');
+    modeIndicator.classList.add('hidden');
+    state.clickMode = null;
+    laneStatusMsg.textContent = `✓ Both lanes marked across ${state.laneCount} lanes.`;
+    showToast('Lane positions set!');
+    setStep(3);
+  }
+  renderLaneOverlay();
+});
+
+// ── RENDER LANE OVERLAY ──
+function renderLaneOverlay() {
+  laneLabelsTop.innerHTML = '';
+
+  if (state.firstLaneX === null) return;
+
+  const positions = getLanePositions();
+  positions.forEach((frac, i) => {
+    const label = document.createElement('div');
+    label.className = 'lane-label-top';
+    label.style.left = (frac * 100) + '%';
+    label.textContent = (i + 1);
+    laneLabelsTop.appendChild(label);
+  });
+}
+
+function getLanePositions() {
+  if (state.firstLaneX === null) return [];
+  const n = state.laneCount;
+  if (n === 1 || state.lastLaneX === null) return [state.firstLaneX];
+  const positions = [];
+  for (let i = 0; i < n; i++) {
+    positions.push(state.firstLaneX + (state.lastLaneX - state.firstLaneX) * (i / (n - 1)));
+  }
+  return positions;
+}
+
+// ── LABEL LIST ──
+function renderLabelList() {
+  laneLabelList.innerHTML = '';
+  for (let i = 0; i < state.laneCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'lane-row';
+
+    const num = document.createElement('span');
+    num.className = 'lane-num';
+    num.textContent = (i + 1);
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = i === 0 ? 'Ladder / MW marker' : `Sample ${i}`;
+    inp.value = state.labels[i] || '';
+    inp.addEventListener('input', e => {
+      state.labels[i] = e.target.value;
+      renderLegend();
+    });
+    // Tab = next lane
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        const next = laneLabelList.querySelectorAll('input')[i + 1];
+        if (next) next.focus(); else inp.blur();
+      }
+    });
+
+    row.appendChild(num);
+    row.appendChild(inp);
+    laneLabelList.appendChild(row);
+  }
+}
+
+document.getElementById('btn-add-lane-row').addEventListener('click', () => {
+  state.laneCount++;
+  syncLaneCount();
+  // focus last input
+  const inputs = laneLabelList.querySelectorAll('input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+});
+
+// ── LEGEND ──
+function renderLegend() {
+  const filled = state.labels.filter(l => l.trim());
+  if (!filled.length) {
+    figLegend.style.display = 'none';
+    return;
+  }
+  figLegend.style.display = 'block';
+
+  let gelType = figGeltypeInput.value.trim();
+  if (gelType) {
+    figLegendTitle.textContent = gelType;
+    figLegendTitle.style.display = 'block';
+  } else {
+    figLegendTitle.style.display = 'none';
+  }
+
+  let html = '';
+  for (let i = 0; i < state.laneCount; i++) {
+    const lbl = state.labels[i];
+    if (lbl && lbl.trim()) {
+      html += `<div><b>${i + 1}:</b> ${escHtml(lbl.trim())}</div>`;
+    }
+  }
+  figLegendBody.innerHTML = html;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── FIGURE TITLE / DATE ──
+function updateFigTitle() {
+  const title = figTitleInput.value.trim();
+  const date = figDateInput.value;
+  const gelType = figGeltypeInput.value.trim();
+  if (title || date) {
+    figTitleArea.style.display = 'block';
+    figTitleDisplay.textContent = title;
+    let dateLine = '';
+    if (date) dateLine = new Date(date + 'T00:00:00').toLocaleDateString('en-AU', { year:'numeric', month:'long', day:'numeric' });
+    if (gelType && date) dateLine = gelType + ' · ' + dateLine;
+    else if (gelType) dateLine = gelType;
+    figDateDisplay.textContent = dateLine;
+    figDateDisplay.style.display = dateLine ? 'block' : 'none';
+  } else {
+    figTitleArea.style.display = 'none';
+  }
+  renderLegend();
+}
+
+figTitleInput.addEventListener('input', updateFigTitle);
+figDateInput.addEventListener('input', updateFigTitle);
+figGeltypeInput.addEventListener('input', updateFigTitle);
+updateFigTitle();
+renderLegend();
+
+// ── IMAGE ADJUSTMENTS ──
+function applyImageFilters() {
+  const b = state.brightness;
+  const c = state.contrast;
+  const inv = state.invert;
+  let filters = `brightness(${1 + b/100}) contrast(${1 + c/100})`;
+  if (inv) filters += ' invert(1)';
+  gelImg.style.filter = filters;
+}
+
+document.getElementById('brightness').addEventListener('input', e => {
+  state.brightness = parseInt(e.target.value);
+  document.getElementById('brightness-val').textContent = state.brightness;
+  applyImageFilters();
+});
+
+document.getElementById('contrast').addEventListener('input', e => {
+  state.contrast = parseInt(e.target.value);
+  document.getElementById('contrast-val').textContent = state.contrast;
+  applyImageFilters();
+});
+
+document.getElementById('invert-img').addEventListener('change', e => {
+  state.invert = e.target.checked;
+  applyImageFilters();
+});
+
+// ── EXPORT ──
+document.getElementById('btn-export-png').addEventListener('click', () => exportFigure('download'));
+document.getElementById('btn-export-clipboard').addEventListener('click', () => exportFigure('clipboard'));
+
+async function exportFigure(mode) {
+  showToast('Rendering figure…');
+
+  // We'll use html2canvas via CDN
+  if (!window.html2canvas) {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  }
+
+  // Temporarily hide click overlay
+  clickOverlay.style.display = 'none';
+
+  try {
+    const canvas = await html2canvas(figureContainer, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      logging: false,
+    });
+
+    if (mode === 'download') {
+      const link = document.createElement('a');
+      const title = figTitleInput.value.trim().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/gi,'') || 'gel_figure';
+      link.download = title + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('PNG exported!');
+    } else if (mode === 'clipboard') {
+      canvas.toBlob(async blob => {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          showToast('Copied to clipboard!');
+        } catch {
+          showToast('Clipboard copy failed — try Download instead.');
+        }
+      });
+    }
+  } catch(err) {
+    showToast('Export failed: ' + err.message);
+  }
+
+  clickOverlay.style.display = '';
+}
+
+document.getElementById('btn-load-new').addEventListener('click', () => {
+  if (!confirm('Load a new image? Current figure will be lost.')) return;
+  location.reload();
+});
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ── STEP INDICATOR ──
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ── INITIAL LABEL RENDER ──
+renderLabelList();
+</script>
+</body>
+</html>
