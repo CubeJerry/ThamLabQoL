@@ -260,7 +260,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Changed from center to allow scrolling large items */
+    justify-content: flex-start;
     overflow: auto;
     background:
       radial-gradient(ellipse at 20% 30%, rgba(126,232,162,0.03) 0%, transparent 60%),
@@ -301,17 +301,8 @@
     width: 100%; height: 100%;
   }
 
-  .drop-icon {
-    font-size: 48px;
-    opacity: 0.4;
-    line-height: 1;
-  }
-
-  .drop-title {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text);
-  }
+  .drop-icon { font-size: 48px; opacity: 0.4; line-height: 1; }
+  .drop-title { font-size: 18px; font-weight: 500; color: var(--text); }
 
   /* ── WORKSPACE ── */
   #workspace {
@@ -320,24 +311,21 @@
     align-items: center;
     gap: 8px;
     width: 100%;
-    max-width: none; /* Let it grow naturally */
+    max-width: none;
   }
 
   /* ── FIGURE CONTAINER (exportable) ── */
   #figure-container {
     background: white;
-    padding: 24px 28px 20px;
+    padding: 45px 40px 30px; /* Increased padding to protect ladder kDa header */
     border-radius: 4px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     user-select: none;
-    width: max-content; /* Hugs the image + legend perfectly */
+    width: max-content;
     margin: 0 auto;
   }
 
-  .fig-title-area {
-    margin-bottom: 24px;
-  }
-
+  .fig-title-area { margin-bottom: 24px; }
   .fig-title {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 32px;
@@ -347,7 +335,6 @@
     white-space: pre-wrap;
     line-height: 1.4;
   }
-
   .fig-date {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 32px;
@@ -370,26 +357,82 @@
     display: inline-block;
     line-height: 0;
     flex-shrink: 0;
+    transition: margin-left 0.2s; /* Smooth transition when ladder is added */
   }
 
   #gel-img {
     display: block;
-    max-width: none; /* Let it expand */
-    max-height: 65vh; /* Keep it vaguely within screen height to avoid infinite scrolling */
+    max-width: none;
+    max-height: 65vh;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
   }
 
+  /* ── LADDER SYSTEM ── */
+  #ladder-area {
+    position: absolute;
+    left: -100px; /* Pull it outside the gel image to the left */
+    top: 0;
+    bottom: 0;
+    width: 90px;
+    display: none; /* Hidden by default */
+    pointer-events: none; /* Let clicks pass through empty spaces */
+    line-height: normal;
+  }
+
+  .ladder-header {
+    position: absolute;
+    top: -38px;
+    right: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: #111;
+  }
+
+  #ladder-labels-container {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  .ladder-label {
+    position: absolute;
+    right: 12px;
+    transform: translateY(-50%);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #111;
+    cursor: ns-resize;
+    user-select: none;
+    white-space: nowrap;
+    pointer-events: auto; /* Re-enable pointer events for dragging */
+    padding: 5px; /* Give a slightly larger hit area */
+    transition: color 0.1s;
+  }
+
+  .ladder-label:hover, .ladder-label.dragging {
+    color: var(--accent);
+  }
+
+  /* The little tick mark pointing to the gel */
+  .ladder-label::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    width: 8px;
+    height: 3px;
+    background: #111;
+  }
+  .ladder-label.dragging::after { background: var(--accent); }
+
+
   /* Lane number labels */
   #lane-labels-top {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 0;
-    pointer-events: none;
+    top: 0; left: 0; width: 100%; height: 0; pointer-events: none;
   }
-
   .lane-label-top {
     position: absolute;
     transform: translateX(-50%) translateY(-100%);
@@ -413,11 +456,7 @@
     text-align: left;
     min-width: 120px;
   }
-
-  .fig-legend-title {
-    font-weight: bold;
-    margin-bottom: 2px;
-  }
+  .fig-legend-title { font-weight: bold; margin-bottom: 2px; }
 
   /* ── CLICK MODE OVERLAY ── */
   #click-overlay {
@@ -427,82 +466,51 @@
     cursor: crosshair;
     z-index: 5;
   }
-
   #click-overlay.active { display: block; }
 
   /* ── INSTRUCTION TOAST ── */
   .toast {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 20px; left: 50%; transform: translateX(-50%);
     background: var(--surface);
     border: 1px solid var(--accent);
     color: var(--accent);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-    z-index: 100;
+    padding: 8px 16px; border-radius: 20px;
+    font-size: 12px; font-family: 'DM Mono', monospace;
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+    white-space: nowrap; z-index: 100;
   }
-
   .toast.show { opacity: 1; }
 
-  /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-  /* ── MODE INDICATOR ── */
   .mode-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: rgba(126,232,162,0.1);
-    color: var(--accent);
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    padding: 3px 8px; border-radius: 4px;
+    background: rgba(126,232,162,0.1); color: var(--accent);
     border: 1px solid rgba(126,232,162,0.25);
   }
 
   .pulse {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: pulse 1.5s ease-in-out infinite;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor; animation: pulse 1.5s ease-in-out infinite;
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .count-row { display: flex; align-items: center; gap: 8px; }
   .count-row button {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+    font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
   }
   .count-row button:hover { border-color: var(--accent); color: var(--accent); }
   .count-display {
-    font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    color: var(--text);
-    min-width: 28px;
-    text-align: center;
+    font-family: 'DM Mono', monospace; font-size: 16px;
+    color: var(--text); min-width: 28px; text-align: center;
   }
 
   input[type="range"] {
@@ -516,8 +524,6 @@
 
   .gel-controls { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
   .hidden { display: none !important; }
-
-  /* Ensure Cropper fits nicely */
   .cropper-container { z-index: 10; }
 </style>
 </head>
@@ -533,7 +539,6 @@
 </header>
 
 <div class="main">
-
   <div class="panel">
     <div class="panel-scroll">
 
@@ -551,14 +556,11 @@
 
       <div class="panel-section hidden" id="img-adjust-section">
         <div class="section-label">Image Adjustments</div>
-        
         <button class="btn btn-sm" id="btn-start-crop" style="width:100%; margin-bottom: 12px;">◩ Crop Image</button>
-        
         <div id="crop-actions" class="hidden" style="display:flex; gap:8px; margin-bottom: 12px;">
           <button class="btn btn-primary btn-sm" id="btn-apply-crop" style="flex:1">✓ Apply</button>
           <button class="btn btn-danger btn-sm" id="btn-cancel-crop" style="flex:1">✕ Cancel</button>
         </div>
-
         <div class="field">
           <label>Brightness <span id="brightness-val" style="color:var(--accent)">0</span></label>
           <input type="range" id="brightness" min="-100" max="100" value="0">
@@ -574,6 +576,13 @@
         </div>
       </div>
 
+      <div class="panel-section" id="ladder-setup-section">
+        <div class="section-label">DNA/Protein Ladder Setup</div>
+        <button class="btn btn-sm" id="btn-preset-ladder" style="width:100%; margin-bottom: 8px;" disabled>+ Add 250kDa Preset</button>
+        <button class="btn btn-sm" id="btn-custom-ladder" style="width:100%; margin-bottom: 8px;" disabled>+ Add Custom Ladder</button>
+        <button class="btn btn-danger btn-sm hidden" id="btn-clear-ladder" style="width:100%;">✕ Clear Ladder</button>
+      </div>
+
       <div class="panel-section" id="lane-setup-section">
         <div class="section-label">Lane Setup</div>
         <div class="field">
@@ -585,11 +594,8 @@
             <span style="font-size:11px; color:var(--text-dim); margin-left:4px;">lanes</span>
           </div>
         </div>
-
         <div id="lane-mode-section">
-          <div class="field" style="margin-bottom:8px;">
-            <label>Lane positions</label>
-          </div>
+          <div class="field" style="margin-bottom:8px;"><label>Lane positions</label></div>
           <button class="btn btn-sm" id="btn-mark-first" disabled><span>◎</span> Click First Lane</button>
           <div style="height:6px"></div>
           <button class="btn btn-sm" id="btn-mark-last" disabled><span>◎</span> Click Last Lane</button>
@@ -631,7 +637,13 @@
         </div>
 
         <div class="figure-content">
-          <div class="gel-wrapper">
+          <div class="gel-wrapper" id="gel-wrapper">
+            
+            <div id="ladder-area">
+              <div class="ladder-header">kDa</div>
+              <div id="ladder-labels-container"></div>
+            </div>
+
             <img id="gel-img" src="" alt="Gel">
             <div id="lane-labels-top"></div>
             <div id="click-overlay"></div>
@@ -671,6 +683,7 @@ const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const workspace = document.getElementById('workspace');
 const gelImg = document.getElementById('gel-img');
+const gelWrapper = document.getElementById('gel-wrapper');
 const laneLabelsTop = document.getElementById('lane-labels-top');
 const clickOverlay = document.getElementById('click-overlay');
 const figTitleInput = document.getElementById('fig-title-input');
@@ -692,6 +705,13 @@ const exportRow = document.getElementById('export-row');
 const imgAdjustSection = document.getElementById('img-adjust-section');
 const figureContainer = document.getElementById('figure-container');
 
+// Ladder Elements
+const ladderArea = document.getElementById('ladder-area');
+const ladderLabelsContainer = document.getElementById('ladder-labels-container');
+const btnPresetLadder = document.getElementById('btn-preset-ladder');
+const btnCustomLadder = document.getElementById('btn-custom-ladder');
+const btnClearLadder = document.getElementById('btn-clear-ladder');
+
 // Cropper UI elements
 const btnStartCrop = document.getElementById('btn-start-crop');
 const cropActions = document.getElementById('crop-actions');
@@ -710,7 +730,6 @@ dropZone.addEventListener('drop', e => {
 });
 fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
 
-
 function loadFile(file) {
   state.imageFile = file;
   const reader = new FileReader();
@@ -725,7 +744,6 @@ function loadFile(file) {
         UTIF.decodeImage(buffer, ifds[0]);
         const rgba = UTIF.toRGBA8(ifds[0]);
         
-        // Convert to canvas so the browser can see it
         const canvas = document.createElement('canvas');
         canvas.width = ifds[0].width;
         canvas.height = ifds[0].height;
@@ -734,9 +752,8 @@ function loadFile(file) {
         imgData.data.set(rgba);
         ctx.putImageData(imgData, 0, 0);
         
-        state.imageSrc = canvas.toDataURL('image/png'); // Standard format
+        state.imageSrc = canvas.toDataURL('image/png');
       } else {
-        // Standard PNG/JPG
         state.imageSrc = e.target.result;
       }
       finishLoadingImage();
@@ -760,11 +777,109 @@ function finishLoadingImage() {
     workspace.style.display = 'flex';
     exportRow.classList.remove('hidden');
     imgAdjustSection.classList.remove('hidden');
+    
+    // Enable workflow buttons
     btnMarkFirst.disabled = false;
+    btnPresetLadder.disabled = false;
+    btnCustomLadder.disabled = false;
+    
     setStep(2);
-    showToast('Image loaded! Crop if needed, or mark lanes.');
+    showToast('Image loaded! Crop if needed, or set up ladder and lanes.');
   };
 }
+
+// ── LADDER LOGIC ──
+
+function makeDraggable(el) {
+  let startY = 0;
+  let startTopPx = 0;
+
+  function dragStart(e) {
+    e.preventDefault();
+    startY = e.clientY;
+    
+    // Calculate current position in pixels based on the parent's actual height
+    const containerHeight = ladderLabelsContainer.clientHeight;
+    const currentTop = el.style.top;
+    
+    if (currentTop.endsWith('%')) {
+      startTopPx = (parseFloat(currentTop) / 100) * containerHeight;
+    } else {
+      startTopPx = parseFloat(currentTop) || 0;
+    }
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    el.style.cursor = 'grabbing';
+    el.classList.add('dragging');
+  }
+
+  function drag(e) {
+    const dy = e.clientY - startY;
+    const containerHeight = ladderLabelsContainer.clientHeight;
+    let newTopPx = startTopPx + dy;
+
+    // Keep it within the bounds of the gel height
+    if (newTopPx < 0) newTopPx = 0;
+    if (newTopPx > containerHeight) newTopPx = containerHeight;
+
+    // Save as percentage so it survives cropping/resizing dynamically
+    el.style.top = (newTopPx / containerHeight * 100) + '%';
+  }
+
+  function dragEnd() {
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', dragEnd);
+    el.style.cursor = 'ns-resize';
+    el.classList.remove('dragging');
+  }
+
+  el.addEventListener('mousedown', dragStart);
+}
+
+function generateLadder(values) {
+  ladderLabelsContainer.innerHTML = '';
+  ladderArea.style.display = 'block';
+  
+  // Create space for the ladder pushing the gel right
+  gelWrapper.style.marginLeft = '100px'; 
+  btnClearLadder.classList.remove('hidden');
+
+  const n = values.length;
+  values.forEach((val, i) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'ladder-label';
+    lbl.textContent = val;
+    // Distribute them evenly initially as percentages
+    lbl.style.top = n > 1 ? (i / (n - 1) * 100) + '%' : '50%';
+    
+    ladderLabelsContainer.appendChild(lbl);
+    makeDraggable(lbl);
+  });
+}
+
+btnPresetLadder.addEventListener('click', () => {
+  generateLadder([250, 150, 100, 75, 50, 37, 25, 20, 15, 10]);
+  showToast('Ladder added! Drag the numbers to align them.');
+});
+
+btnCustomLadder.addEventListener('click', () => {
+  const input = prompt("Enter ladder values separated by commas\n(e.g., 200, 150, 100, 50):", "200, 150, 100, 50, 25");
+  if (input) {
+    const vals = input.split(',').map(s => s.trim()).filter(s => s);
+    if (vals.length > 0) {
+      generateLadder(vals);
+      showToast('Custom ladder added! Drag the numbers to align.');
+    }
+  }
+});
+
+btnClearLadder.addEventListener('click', () => {
+  ladderArea.style.display = 'none';
+  ladderLabelsContainer.innerHTML = '';
+  gelWrapper.style.marginLeft = '0';
+  btnClearLadder.classList.add('hidden');
+});
 
 // ── CROPPER LOGIC ──
 btnStartCrop.addEventListener('click', () => {
@@ -830,7 +945,7 @@ function enterClickMode(mode) {
 
 clickOverlay.addEventListener('click', e => {
   if (!state.clickMode) return;
-  const rect = gelImg.getBoundingClientRect();
+  const rect = clickOverlay.getBoundingClientRect(); // Safe bounds
   const xFrac = (e.clientX - rect.left) / rect.width;
 
   if (state.clickMode === 'first') {
