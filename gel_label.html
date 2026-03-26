@@ -1060,6 +1060,15 @@ function showToast(m) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+function applyImageFilters() {
+  gelImg.style.filter = `brightness(${1 + state.brightness/100}) contrast(${1 + state.contrast/100}) ${state.invert ? 'invert(1)' : ''}`;
+}
+  
+document.getElementById('brightness').addEventListener('input', e => { state.brightness = parseInt(e.target.value); document.getElementById('brightness-val').textContent = state.brightness; applyImageFilters(); });
+document.getElementById('contrast').addEventListener('input', e => { state.contrast = parseInt(e.target.value); document.getElementById('contrast-val').textContent = state.contrast; applyImageFilters(); });
+document.getElementById('invert-img').addEventListener('change', e => { state.invert = e.target.checked; applyImageFilters(); });
+
+
 // ── SVG EXPORT LOGIC ──
 document.getElementById('btn-export-svg').addEventListener('click', () => {
     const container = figureContainer;
