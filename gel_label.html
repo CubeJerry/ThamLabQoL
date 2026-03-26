@@ -658,6 +658,7 @@
 
       <div id="export-row" class="hidden" style="margin-top:20px; margin-bottom: 40px; display:flex; gap:8px;">
         <button class="btn btn-primary" id="btn-export-png">↓ Export PNG</button>
+        <button class="btn btn-primary" id="btn-export-svg" style="background:#f57c00; border-color:#f57c00;">↓ Export SVG (Affinity Designer)</button>
         <button class="btn" id="btn-export-clipboard">⧉ Copy to Clipboard</button>
         <button class="btn btn-ghost" id="btn-load-new">⟳ New Image</button>
       </div>
@@ -669,6 +670,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 const state = {
@@ -798,7 +800,6 @@ function makeDraggable(el) {
     e.preventDefault();
     startY = e.clientY;
     
-    // Calculate current position in pixels based on the parent's actual height
     const containerHeight = ladderLabelsContainer.clientHeight;
     const currentTop = el.style.top;
     
@@ -819,11 +820,9 @@ function makeDraggable(el) {
     const containerHeight = ladderLabelsContainer.clientHeight;
     let newTopPx = startTopPx + dy;
 
-    // Keep it within the bounds of the gel height
     if (newTopPx < 0) newTopPx = 0;
     if (newTopPx > containerHeight) newTopPx = containerHeight;
 
-    // Save as percentage so it survives cropping/resizing dynamically
     el.style.top = (newTopPx / containerHeight * 100) + '%';
   }
 
@@ -840,8 +839,6 @@ function makeDraggable(el) {
 function generateLadder(values) {
   ladderLabelsContainer.innerHTML = '';
   ladderArea.style.display = 'block';
-  
-  // Create space for the ladder pushing the gel right
   gelWrapper.style.marginLeft = '100px'; 
   btnClearLadder.classList.remove('hidden');
 
@@ -850,7 +847,6 @@ function generateLadder(values) {
     const lbl = document.createElement('div');
     lbl.className = 'ladder-label';
     lbl.textContent = val;
-    // Distribute them evenly initially as percentages
     lbl.style.top = n > 1 ? (i / (n - 1) * 100) + '%' : '50%';
     
     ladderLabelsContainer.appendChild(lbl);
@@ -864,7 +860,7 @@ btnPresetLadder.addEventListener('click', () => {
 });
 
 btnCustomLadder.addEventListener('click', () => {
-  const input = prompt("Enter ladder values separated by commas\n(e.g., 200, 150, 100, 50):", "200, 150, 100, 50, 25");
+  const input = prompt("Enter ladder values separated by commas:", "200, 150, 100, 50, 25");
   if (input) {
     const vals = input.split(',').map(s => s.trim()).filter(s => s);
     if (vals.length > 0) {
@@ -945,7 +941,7 @@ function enterClickMode(mode) {
 
 clickOverlay.addEventListener('click', e => {
   if (!state.clickMode) return;
-  const rect = clickOverlay.getBoundingClientRect(); // Safe bounds
+  const rect = clickOverlay.getBoundingClientRect();
   const xFrac = (e.clientX - rect.left) / rect.width;
 
   if (state.clickMode === 'first') {
@@ -989,21 +985,12 @@ function renderLabelList() {
     inp.placeholder = i === 0 ? 'Ladder' : `Sample ${i}`;
     inp.value = state.labels[i] || '';
     inp.addEventListener('input', e => { state.labels[i] = e.target.value; renderLegend(); });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === 'Tab') {
-        e.preventDefault();
-        const next = laneLabelList.querySelectorAll('input')[i + 1];
-        if (next) next.focus(); else inp.blur();
-      }
-    });
     row.appendChild(num); row.appendChild(inp); laneLabelList.appendChild(row);
   }
 }
 
 document.getElementById('btn-add-lane-row').addEventListener('click', () => {
   state.laneCount++; syncLaneCount();
-  const inputs = laneLabelList.querySelectorAll('input');
-  if (inputs.length) inputs[inputs.length - 1].focus();
 });
 
 function renderLegend() {
@@ -1013,7 +1000,7 @@ function renderLegend() {
   let html = '';
   for (let i = 0; i < state.laneCount; i++) {
     if (state.labels[i] && state.labels[i].trim()) {
-      html += `<div><b>${i + 1}:</b> ${state.labels[i].trim().replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+      html += `<div><b>${i + 1}:</b> ${state.labels[i].trim()}</div>`;
     }
   }
   figLegendBody.innerHTML = html;
@@ -1022,57 +1009,113 @@ function renderLegend() {
 function updateFigTitle() {
   const title = figTitleInput.value.trim();
   const date = figDateInput.value;
-  if (title || date) {
-    figTitleArea.style.display = 'block';
-    figTitleDisplay.textContent = title;
-    figDateDisplay.textContent = date ? new Date(date + 'T00:00:00').toLocaleDateString('en-AU', { year:'numeric', month:'long', day:'numeric' }) : '';
-    figDateDisplay.style.display = date ? 'block' : 'none';
-  } else {
-    figTitleArea.style.display = 'none';
-  }
-  renderLegend();
+  figTitleArea.style.display = (title || date) ? 'block' : 'none';
+  figTitleDisplay.textContent = title;
+  figDateDisplay.textContent = date ? new Date(date).toLocaleDateString() : '';
 }
 
-function applyImageFilters() {
-  gelImg.style.filter = `brightness(${1 + state.brightness/100}) contrast(${1 + state.contrast/100}) ${state.invert ? 'invert(1)' : ''}`;
+function setStep(s) {
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.classList.toggle('active', i+1 === s);
+    el.classList.toggle('done', i+1 < s);
+  });
 }
 
-document.getElementById('brightness').addEventListener('input', e => { state.brightness = parseInt(e.target.value); document.getElementById('brightness-val').textContent = state.brightness; applyImageFilters(); });
-document.getElementById('contrast').addEventListener('input', e => { state.contrast = parseInt(e.target.value); document.getElementById('contrast-val').textContent = state.contrast; applyImageFilters(); });
-document.getElementById('invert-img').addEventListener('change', e => { state.invert = e.target.checked; applyImageFilters(); });
+function showToast(m) {
+  toast.textContent = m; toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
-// ── EXPORT ──
-document.getElementById('btn-export-png').addEventListener('click', () => exportFigure('download'));
-document.getElementById('btn-export-clipboard').addEventListener('click', () => exportFigure('clipboard'));
+// ── SVG EXPORT LOGIC ──
+document.getElementById('btn-export-svg').addEventListener('click', () => {
+    const container = figureContainer;
+    const rect = container.getBoundingClientRect();
+    const bgWidth = rect.width;
+    const bgHeight = rect.height;
 
-async function exportFigure(mode) {
-  showToast('Rendering figure…');
-  if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-  
-  clickOverlay.style.display = 'none';
-  try {
-    const canvas = await html2canvas(figureContainer, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
-    if (mode === 'download') {
-      const link = document.createElement('a');
-      link.download = (figTitleInput.value.trim().replace(/\s+/g,'_').replace(/[^a-z0-9_-]/gi,'') || 'gel_figure') + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('PNG exported!');
-    } else {
-      canvas.toBlob(async blob => {
-        try { await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]); showToast('Copied to clipboard!'); }
-        catch { showToast('Clipboard copy failed — try Download.'); }
-      });
+    let svg = `<svg width="${bgWidth}" height="${bgHeight}" viewBox="0 0 ${bgWidth} ${bgHeight}" xmlns="http://www.w3.org/2000/svg">`;
+    svg += `<rect width="100%" height="100%" fill="white" />`;
+
+    // 1. Add Image
+    const img = document.getElementById('gel-img');
+    const imgRect = img.getBoundingClientRect();
+    const contRect = container.getBoundingClientRect();
+    const imgX = imgRect.left - contRect.left;
+    const imgY = imgRect.top - contRect.top;
+    svg += `<image href="${state.imageSrc}" x="${imgX}" y="${imgY}" width="${imgRect.width}" height="${imgRect.height}" />`;
+
+    // 2. Helper for Text
+    const addText = (el, xOffset = 0, yOffset = 0, align = "start") => {
+        if (!el) return "";
+        const r = el.getBoundingClientRect();
+        const x = r.left - contRect.left + xOffset;
+        const y = r.top - contRect.top + yOffset + (r.height * 0.8); // Adjust baseline
+        const size = window.getComputedStyle(el).fontSize;
+        const weight = window.getComputedStyle(el).fontWeight;
+        const color = window.getComputedStyle(el).color;
+        const text = el.textContent;
+        return `<text x="${x}" y="${y}" font-family="Arial, sans-serif" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${align}">${text}</text>`;
+    };
+
+    // 3. Title & Date
+    if (figTitleArea.style.display !== 'none') {
+        svg += addText(figTitleDisplay, figTitleDisplay.offsetWidth/2, 0, "middle");
+        svg += addText(figDateDisplay, figDateDisplay.offsetWidth/2, 0, "middle");
     }
-  } catch(err) { showToast('Export failed: ' + err.message); }
-  clickOverlay.style.display = '';
-}
 
-document.getElementById('btn-load-new').addEventListener('click', () => { if (confirm('Load a new image? Current figure will be lost.')) location.reload(); });
-function loadScript(src) { return new Promise((resolve, reject) => { const s = document.createElement('script'); s.src = src; s.onload = resolve; s.onerror = reject; document.head.appendChild(s); }); }
-function setStep(n) { for (let i = 1; i <= 3; i++) { const el = document.getElementById('step' + i); el.classList.remove('active', 'done'); if (i < n) el.classList.add('done'); else if (i === n) el.classList.add('active'); } }
-let toastTimer;
-function showToast(msg) { toast.textContent = msg; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2800); }
+    // 4. Lane Labels
+    document.querySelectorAll('.lane-label-top').forEach(lbl => {
+        svg += addText(lbl, 0, 0, "middle");
+    });
+
+    // 5. Ladder
+    if (ladderArea.style.display !== 'none') {
+        svg += addText(document.querySelector('.ladder-header'));
+        document.querySelectorAll('.ladder-label').forEach(lbl => {
+            const r = lbl.getBoundingClientRect();
+            const x = r.left - contRect.left;
+            const y = r.top - contRect.top + (r.height * 0.75);
+            svg += `<text x="${x}" y="${y}" font-family="Arial, sans-serif" font-size="24px" font-weight="bold" fill="black">${lbl.textContent}</text>`;
+            // Add the tick mark
+            svg += `<rect x="${x + r.width + 5}" y="${y - 8}" width="8" height="3" fill="black" />`;
+        });
+    }
+
+    // 6. Legend
+    if (figLegend.style.display !== 'none') {
+        const legendItems = figLegendBody.querySelectorAll('div');
+        legendItems.forEach((div, i) => {
+            const r = div.getBoundingClientRect();
+            const x = r.left - contRect.left;
+            const y = r.top - contRect.top + (r.height * 0.7);
+            // Replace bold tags with simple text for export
+            const cleanText = div.textContent;
+            svg += `<text x="${x}" y="${y}" font-family="Arial, sans-serif" font-size="32px" fill="black">${cleanText}</text>`;
+        });
+    }
+
+    svg += `</svg>`;
+
+    const blob = new Blob([svg], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Gel_Analysis_${new Date().getTime()}.svg`;
+    link.click();
+    showToast('SVG Exported! Open in Affinity Designer.');
+});
+
+// Standard PNG Export
+document.getElementById('btn-export-png').addEventListener('click', () => {
+  html2canvas(figureContainer, { scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'gel-annotation.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+});
+
+document.getElementById('btn-load-new').addEventListener('click', () => location.reload());
 
 syncLaneCount();
 </script>
