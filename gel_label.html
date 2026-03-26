@@ -1069,6 +1069,22 @@ document.getElementById('contrast').addEventListener('input', e => { state.contr
 document.getElementById('invert-img').addEventListener('change', e => { state.invert = e.target.checked; applyImageFilters(); });
 
 
+// ── BAKE FILTERS ONTO A CANVAS AND RETURN A DATA URL ──
+function getFilteredImageDataUrl() {
+  const img = document.getElementById('gel-img');
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+  const offscreen = document.createElement('canvas');
+  offscreen.width = w;
+  offscreen.height = h;
+  const ctx = offscreen.getContext('2d');
+
+  // Apply brightness / contrast via CSS filter on the canvas context
+  ctx.filter = `brightness(${1 + state.brightness/100}) contrast(${1 + state.contrast/100}) ${state.invert ? 'invert(1)' : ''}`;
+  ctx.drawImage(img, 0, 0, w, h);
+  return offscreen.toDataURL('image/png');
+}
+
 // ── SVG EXPORT LOGIC ──
 document.getElementById('btn-export-svg').addEventListener('click', () => {
     const container = figureContainer;
@@ -1079,13 +1095,14 @@ document.getElementById('btn-export-svg').addEventListener('click', () => {
     let svg = `<svg width="${bgWidth}" height="${bgHeight}" viewBox="0 0 ${bgWidth} ${bgHeight}" xmlns="http://www.w3.org/2000/svg">`;
     svg += `<rect width="100%" height="100%" fill="white" />`;
 
-    // 1. Add Image
+    // 1. Add Image — use filter-baked data URL
     const img = document.getElementById('gel-img');
     const imgRect = img.getBoundingClientRect();
     const contRect = container.getBoundingClientRect();
     const imgX = imgRect.left - contRect.left;
     const imgY = imgRect.top - contRect.top;
-    svg += `<image href="${state.imageSrc}" x="${imgX}" y="${imgY}" width="${imgRect.width}" height="${imgRect.height}" />`;
+    const filteredSrc = getFilteredImageDataUrl();
+    svg += `<image href="${filteredSrc}" x="${imgX}" y="${imgY}" width="${imgRect.width}" height="${imgRect.height}" />`;
 
     // 2. Helper for Text
     const addText = (el, xOffset = 0, yOffset = 0, align = "start") => {
@@ -1148,13 +1165,32 @@ document.getElementById('btn-export-svg').addEventListener('click', () => {
     showToast('SVG Exported! Open in Affinity Designer.');
 });
 
-// Standard PNG Export
+// Standard PNG Export — temporarily swap gel src to filtered version so html2canvas captures it correctly
 document.getElementById('btn-export-png').addEventListener('click', () => {
-  html2canvas(figureContainer, { scale: 2 }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'gel-annotation.png';
-    link.href = canvas.toDataURL();
-    link.click();
+  const img = document.getElementById('gel-img');
+  const originalSrc = img.src;
+  const originalFilter = img.style.filter;
+
+  // Bake filters into a data URL, then clear the CSS filter so html2canvas doesn't double-apply
+  const filteredSrc = getFilteredImageDataUrl();
+  img.src = filteredSrc;
+  img.style.filter = '';
+
+  // Wait a tick for the src swap to settle before capturing
+  requestAnimationFrame(() => {
+    html2canvas(figureContainer, { scale: 2, useCORS: true }).then(canvas => {
+      // Restore original
+      img.src = originalSrc;
+      img.style.filter = originalFilter;
+
+      const link = document.createElement('a');
+      link.download = 'gel-annotation.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }).catch(() => {
+      img.src = originalSrc;
+      img.style.filter = originalFilter;
+    });
   });
 });
 
