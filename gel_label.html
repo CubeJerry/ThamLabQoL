@@ -225,6 +225,17 @@
   }
   .btn-ghost:hover { color: var(--red); border-color: transparent; background: transparent; }
 
+  /* ── UNIT TOGGLE BUTTONS ── */
+  .btn-unit {
+    background: var(--bg);
+    color: var(--text-dim);
+  }
+  .btn-unit.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(88, 178, 220, 0.1);
+  }
+
   .panel-scroll {
     overflow-y: auto;
     flex: 1;
@@ -578,7 +589,17 @@
 
       <div class="panel-section" id="ladder-setup-section">
         <div class="section-label">DNA/Protein Ladder Setup</div>
-        <button class="btn btn-sm" id="btn-preset-ladder" style="width:100%; margin-bottom: 8px;" disabled>+ Add 250kDa Preset</button>
+        
+        <div class="field" style="margin-bottom: 12px;">
+          <label>Unit</label>
+          <div style="display: flex; gap: 4px;">
+            <button class="btn btn-sm btn-unit active" data-unit="kDa" style="flex:1">kDa</button>
+            <button class="btn btn-sm btn-unit" data-unit="bp" style="flex:1">bp</button>
+            <button class="btn btn-sm btn-unit" data-unit="kb" style="flex:1">Kb</button>
+          </div>
+        </div>
+
+        <button class="btn btn-sm" id="btn-preset-ladder" style="width:100%; margin-bottom: 8px;" disabled>+ Add Preset</button>
         <button class="btn btn-sm" id="btn-custom-ladder" style="width:100%; margin-bottom: 8px;" disabled>+ Add Custom Ladder</button>
         <button class="btn btn-danger btn-sm hidden" id="btn-clear-ladder" style="width:100%;">✕ Clear Ladder</button>
       </div>
@@ -713,7 +734,8 @@ const ladderLabelsContainer = document.getElementById('ladder-labels-container')
 const btnPresetLadder = document.getElementById('btn-preset-ladder');
 const btnCustomLadder = document.getElementById('btn-custom-ladder');
 const btnClearLadder = document.getElementById('btn-clear-ladder');
-
+const ladderHeader = document.querySelector('.ladder-header'); 
+const unitButtons = document.querySelectorAll('.btn-unit');
 // Cropper UI elements
 const btnStartCrop = document.getElementById('btn-start-crop');
 const cropActions = document.getElementById('crop-actions');
@@ -791,7 +813,19 @@ function finishLoadingImage() {
 }
 
 // ── LADDER LOGIC ──
-
+// Unit Toggle Logic
+unitButtons.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Remove active class from all buttons
+    unitButtons.forEach(b => b.classList.remove('active'));
+    // Add active class to the clicked button
+    e.target.classList.add('active');
+    
+    // Update the text on the canvas
+    const unit = e.target.dataset.unit;
+    ladderHeader.textContent = unit;
+  });
+});
 function makeDraggable(el) {
   let startY = 0;
   let startTopPx = 0;
