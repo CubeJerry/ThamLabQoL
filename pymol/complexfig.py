@@ -48,6 +48,7 @@ def complexfig(obj, chain_ids):
     cmd.set("antialias", 2)
     cmd.set("ray_shadow", "off")
     cmd.bg_color("white")
+    cmd.set("hash_max", 2000)
 
     cmd.orient()
     cmd.zoom("all")
