@@ -26,7 +26,7 @@ def contact_figure(receptor, ligand, states=0):
     contact_area = ((ligand_area + receptor_area) - complex_area) / 2
 
     cmd.delete('complextemp')
-    cmd.select('contact', f"({receptor} and ({ligand}_all around 3.9))")
+    cmd.select('contact', f"({receptor} and ({ligand}_all around 6))")
 
     with open('contactareas.txt', 'a') as f:
         f.write(f"{receptor}\t{ligand}\t{contact_area}\n")
