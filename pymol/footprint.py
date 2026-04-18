@@ -33,7 +33,7 @@ def contact_figure(antigen, receptor):
 
     cmd.show('surface', 'contact')
     cmd.color('red', 'contact')
-
+    cmd.set("transparency", 0.1, antigen)
 
     # ── 3. Render settings ────────────────────────────────────────────────
     cmd.bg_color('white')
