@@ -5,7 +5,7 @@ def contact_figure(receptor, ligand, states=0):
     Calculates the contact surface and sets up the figure styling,
     ready for you to orient and ray trace manually.
 
-    USAGE: contact_figure receptor, ligand, [states=0]
+    USAGE: contact_figure receptor, antigen, [states=0]
     """
     # ── 1. Calculate contact surface ──────────────────────────────────────
     states = abs(int(states))
