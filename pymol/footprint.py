@@ -26,22 +26,18 @@ def contact_figure(antigen, receptor):
 
     # ── 2. Set up visuals ─────────────────────────────────────────────────
     cmd.hide('everything')
-
-    cmd.show('cartoon', receptor)
     cmd.show('surface', receptor)
     cmd.color('white', receptor)
-    cmd.set('transparency', 0.25, receptor)
-
     cmd.show('cartoon', antigen)
     cmd.color('skyblue', antigen)
 
     cmd.show('surface', 'contact')
     cmd.color('red', 'contact')
-    cmd.set('transparency', 0.0, 'contact')
+
 
     # ── 3. Render settings ────────────────────────────────────────────────
     cmd.bg_color('white')
-    cmd.set('ray_shadows', 0)
+    cmd.set('ray_shadows', "off")
     cmd.set('ray_opaque_background', 1)
     cmd.set('antialias', 2)
     cmd.set('ray_trace_mode', 1)
@@ -55,6 +51,5 @@ def contact_figure(antigen, receptor):
 
 
     cmd.orient(antigen)
-    cmd.zoom('all', buffer=5)
 
 cmd.extend("footprint", contact_figure)
