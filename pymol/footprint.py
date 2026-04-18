@@ -4,25 +4,25 @@ def contact_figure(antigen, receptor):
     """
     Calculates the contact footprint and sets up the figure styling
     on the existing objects, ready for you to orient and ray trace manually.
-    USAGE: contact_figure antigen, receptor
+    USAGE: footprint antigen, receptor
     """
     # ── 1. Calculate contact surface ──────────────────────────────────────
     cmd.flag('ignore', 'none')
     cmd.set('dot_solvent', 1)
     cmd.set('dot_density', 3)
 
-    cmd.create('complextemp', f"{antigen} {receptor}")
+    cmd.create('complextemp', "{} {}".format(antigen, receptor))
     antigen_area = cmd.get_area(antigen)
     receptor_area = cmd.get_area(receptor)
     complex_area = cmd.get_area('complextemp')
     contact_area = ((antigen_area + receptor_area) - complex_area) / 2
     cmd.delete('complextemp')
 
-    cmd.select('contact', f"({receptor} and ({antigen} around 6))")
+    cmd.select('contact', "({} and ({} around 6))".format(receptor, antigen))
 
     with open('contactareas.txt', 'a') as f:
-        f.write(f"{receptor}\t{antigen}\t{contact_area}\n")
-    print(f"Global contact area between {receptor} and {antigen}: {contact_area:.2f} Å²")
+        f.write("{}\t{}\t{}\n".format(receptor, antigen, contact_area))
+    print("Global contact area between {} and {}: {:.2f} Å²".format(receptor, antigen, contact_area))
 
     # ── 2. Set up visuals ─────────────────────────────────────────────────
     cmd.hide('everything')
