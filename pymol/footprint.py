@@ -1,3 +1,5 @@
+from pymol import cmd, stored
+
 def contact_figure(receptor, ligand, states=0):
     """
     Calculates the contact surface and sets up the figure styling,
