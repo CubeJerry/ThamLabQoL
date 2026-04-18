@@ -48,7 +48,7 @@ def contact_figure(antigen, receptor):
     cmd.set('ray_trace_gain', 0.1)
     cmd.set('surface_quality', 1)
     cmd.set('cartoon_fancy_helices', 1)
-    cmd.set('hash_max', 1000)
+    cmd.set('hash_max', 2000)
 
     cmd.orient(receptor)
     cmd.zoom('all', buffer=5)
