@@ -38,16 +38,14 @@ def contact_figure(antigen, receptor):
     # ── 3. Render settings ────────────────────────────────────────────────
     cmd.bg_color('white')
     cmd.set('ray_shadows', "off")
-    cmd.set('ray_opaque_background', 1)
     cmd.set('antialias', 2)
     cmd.set('ray_trace_mode', 1)
-    cmd.set('ray_trace_gain', 0.1)
     cmd.set('surface_quality', 1)
     cmd.set('cartoon_fancy_helices', 1)
     cmd.set('hash_max', 2000)
     cmd.set('ambient_occlusion_mode', 1)
     cmd.set('ambient', 0.3)
-
+    cmd.set("specular", 0)
 
 
     cmd.orient(antigen)
