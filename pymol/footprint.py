@@ -4,7 +4,7 @@ def contact_figure(antigen, receptor):
     """
     Calculates the contact footprint and sets up the figure styling
     on the existing objects, ready for you to orient and ray trace manually.
-    USAGE: footprint antigen, receptor
+    USAGE: footprint receptor, antigen
     """
     # ── 1. Calculate contact surface ──────────────────────────────────────
     cmd.flag('ignore', 'none')
