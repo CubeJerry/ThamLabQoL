@@ -1,4 +1,4 @@
-from pymol import cmd, stored
+from pymol import cmd
 
 def contact_figure(receptor, ligand, states=0):
     """
