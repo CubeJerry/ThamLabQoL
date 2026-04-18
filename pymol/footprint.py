@@ -49,8 +49,12 @@ def contact_figure(antigen, receptor):
     cmd.set('surface_quality', 1)
     cmd.set('cartoon_fancy_helices', 1)
     cmd.set('hash_max', 2000)
+    cmd.set('ambient_occlusion_mode', 1)
+    cmd.set('ambient', 0.3)
 
-    cmd.orient(receptor)
+
+
+    cmd.orient(antigen)
     cmd.zoom('all', buffer=5)
 
 cmd.extend("footprint", contact_figure)
