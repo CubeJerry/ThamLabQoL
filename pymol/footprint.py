@@ -52,3 +52,5 @@ def contact_figure(antigen, receptor):
 
     cmd.orient(receptor)
     cmd.zoom('all', buffer=5)
+
+cmd.extend("footprint", contact_figure)
